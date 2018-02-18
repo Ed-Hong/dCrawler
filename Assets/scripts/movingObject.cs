@@ -4,15 +4,15 @@ using System.Collections;
     //The abstract keyword enables you to create classes and class members that are incomplete and must be implemented in a derived class.
     public abstract class movingObject : MonoBehaviour
     {
-        public float moveTime = 1f;           //Time it will take object to move, in seconds.
-        public LayerMask blockingLayer;         //Layer on which collision will be checked.
-        protected int pixelsPerTile = 45;
-        
-        private BoxCollider2D boxCollider;      //The BoxCollider2D component attached to this object.
-        private Rigidbody2D rb2D;               //The Rigidbody2D component attached to this object.
-        private float inverseMoveTime;          //Used to make movement more efficient.
-        
-        
+        protected int           speed               = 10;              //nebulous int that effects the speed of the move transition
+        private float           moveTime            = 0.1f;             //???
+        private float           inverseMoveTime;                        //Used to make movement more efficient.
+
+        private BoxCollider2D   boxCollider;                           //The BoxCollider2D component attached to this object.
+        private Rigidbody2D     rb2D;                                  //The Rigidbody2D component attached to this object.
+        public LayerMask        blockingLayer;                         //Layer on which collision will be checked.
+        public int              pixelsPerTile = 27;                          //eddy make this into x and y 
+
         //Protected, virtual functions can be overridden by inheriting classes.
         protected virtual void Start ()
         {
@@ -35,7 +35,7 @@ using System.Collections;
             Vector2 start = transform.position;
 
             // Calculate end position based on the direction parameters passed in when calling Move.
-            Vector2 end = start + new Vector2 (xDir * pixelsPerTile, yDir * pixelsPerTile);
+            Vector2 end = start + new Vector2 (xDir * gameManager.instance.xTileSize, yDir * gameManager.instance.yTileSize);
             
             //Disable the boxCollider so that linecast doesn't hit this object's own collider.
             boxCollider.enabled = false;
@@ -72,7 +72,7 @@ using System.Collections;
             while(sqrRemainingDistance > float.Epsilon)
             {
                 //Find a new position proportionally closer to the end, based on the moveTime
-                Vector3 newPostion = Vector3.MoveTowards(rb2D.position, end, inverseMoveTime * ((1.5f* pixelsPerTile) * Time.deltaTime));
+                Vector3 newPostion = Vector3.MoveTowards(rb2D.position, end, inverseMoveTime * ((1.5f* speed) * Time.deltaTime));
                 
                 //Call MovePosition on attached Rigidbody2D and move it to the calculated position.
                 rb2D.MovePosition (newPostion);
