@@ -3,8 +3,8 @@
 
 
 # TODO
-Finish Implementing Enemy Movement
-Implement Enemy Attacks
+1. Finish Implementing Enemy Movement
+1. Implement Enemy Attacks
 
 # BUGS
 lol
