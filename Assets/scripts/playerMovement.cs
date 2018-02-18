@@ -1,8 +1,10 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 using UnityEngine.SceneManagement;      //Allows us to use SceneManager
+using Util;
 
-    //Player inherits from MovingObject, our base class for objects that can move, Enemy also inherits from this.
+//Player inherits from MovingObject, our base class for objects that can move, Enemy also inherits from this.
 public class playerMovement : movingObject
 {
     public float restartLevelDelay = 1f;        //Delay time in seconds to restart level.
@@ -10,7 +12,7 @@ public class playerMovement : movingObject
     public int pointsPerSoda = 20;              //Number of points to add to player food points when picking up a soda object.
     public int wallDamage = 1;                  //How much damage a player does to a wall when chopping it.
     private Animator animator;                  //Used to store a reference to the Player's animator component.
-    
+    public Direction direction = Direction.NORTH;
     
     //Start overrides the Start function of MovingObject
     protected override void Start ()
@@ -39,16 +41,25 @@ public class playerMovement : movingObject
         
         if(Input.GetKeyDown("w")){
             vertical += 1;
+            Turn(Direction.NORTH);
         }else if(Input.GetKeyDown("s")){
             vertical -= 1;
+            Turn(Direction.SOUTH);
         }else if(Input.GetKeyDown("a")){
             horizontal -= 1;
+            Turn(Direction.WEST);
         }else if(Input.GetKeyDown("d")){
             horizontal += 1;
+            Turn(Direction.EAST);
         }
-        
+
+        if (Input.GetKeyDown("j"))
+        {
+            print(gameManager.instance.canMove);
+        }
+
         //prevent diagonal movements
-        if(horizontal != 0)
+        if (horizontal != 0)
         {
             vertical = 0;
         }
@@ -56,14 +67,17 @@ public class playerMovement : movingObject
         //see if input in h or v is not zero
         if(horizontal != 0 || vertical != 0)
         {
-            AttemptMove<BoxCollider> (horizontal, vertical);
-            gameManager.instance.canMove = false; //disables input until player is done changin tiles
+            if(AttemptMove<BoxCollider> (horizontal, vertical))
+            {
+                gameManager.instance.canMove = false; //disables input until player is done changin tiles
+            }
+            AttemptAttack();
         }
     }
     
     //AttemptMove overrides the AttemptMove function in the base class MovingObject
     //AttemptMove takes a generic parameter T which for Player will be of the type Wall, it also takes integers for x and y direction to move in.
-    protected override void AttemptMove <T> (int xDir, int yDir)
+    protected override bool AttemptMove <T> (int xDir, int yDir)
     {
         //Every time player moves, subtract from food points total.
         
@@ -72,12 +86,16 @@ public class playerMovement : movingObject
         
         //Hit allows us to reference the result of the Linecast done in Move.
         RaycastHit2D hit;
-        
+
+        bool didMove = Move(xDir, yDir, out hit);
+
         //If Move returns true, meaning Player was able to move into an empty space.
-        if (Move(xDir, yDir, out hit)) 
+        if (didMove) 
         {
             //Call RandomizeSfx of SoundManager to play the move sound, passing in two audio clips to choose from.
         }
+
+        return didMove;
     }
     
     
@@ -85,7 +103,46 @@ public class playerMovement : movingObject
     //It takes a generic parameter T which in the case of Player is a Wall which the player can attack and destroy.
     protected override void OnCantMove <T> (T component)
     {
-        
+        print("CANT MOVE");
+    }
+
+    protected void Turn(Direction dir) 
+    {
+        direction = dir;
+    }
+
+    protected void AttemptAttack()
+    {
+        var playerPos = transform.position;
+
+        // bottom of T
+        Vector2 attackPos = new Vector2(playerPos.x, playerPos.y + base.pixelsPerTile);
+        RaycastHit2D hit = Physics2D.Raycast(attackPos, Vector2.zero);
+
+        // center of T
+        Vector2 attackPos2 = new Vector2(playerPos.x, playerPos.y + 2*base.pixelsPerTile);
+        RaycastHit2D hit2 = Physics2D.Raycast(attackPos2, Vector2.zero);
+
+        // topleft of T
+        Vector2 attackPos3 = new Vector2(playerPos.x - base.pixelsPerTile, playerPos.y + 2*base.pixelsPerTile);
+        RaycastHit2D hit3 = Physics2D.Raycast(attackPos3, Vector2.zero);
+
+        // topright of T
+        Vector2 attackPos4 = new Vector2(playerPos.x + base.pixelsPerTile, playerPos.y + 2*base.pixelsPerTile);
+        RaycastHit2D hit4 = Physics2D.Raycast(attackPos4, Vector2.zero);
+
+        var attackRange = new List<RaycastHit2D>()
+        {
+            hit,
+            hit2,
+            hit3,
+            hit4
+        };
+
+        if (attackRange.Any(h => h.collider != null)) {
+            //checkHit(hit);
+            print("HIT");
+        }
     }
     
     

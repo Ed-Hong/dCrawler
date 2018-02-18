@@ -6,7 +6,7 @@ using System.Collections;
     {
         public float moveTime = 1f;           //Time it will take object to move, in seconds.
         public LayerMask blockingLayer;         //Layer on which collision will be checked.
-        private int pixelsPerTile = 45;
+        protected int pixelsPerTile = 45;
         
         private BoxCollider2D boxCollider;      //The BoxCollider2D component attached to this object.
         private Rigidbody2D rb2D;               //The Rigidbody2D component attached to this object.
@@ -89,7 +89,7 @@ using System.Collections;
         
         //The virtual keyword means AttemptMove can be overridden by inheriting classes using the override keyword.
         //AttemptMove takes a generic parameter T to specify the type of component we expect our unit to interact with if blocked (Player for Enemies, Wall for Player).
-        protected virtual void AttemptMove <T> (int xDir, int yDir) 
+        protected virtual bool AttemptMove <T> (int xDir, int yDir) 
         where T : Component
         {
             //Hit will store whatever our linecast hits when Move is called.
@@ -100,16 +100,18 @@ using System.Collections;
             
             //Check if nothing was hit by linecast
             if(hit.transform == null)
-                return;
+                return false;
             
             //Get a component reference to the component of type T attached to the object that was hit
             T hitComponent = hit.transform.GetComponent<T> ();
             
             //If canMove is false and hitComponent is not equal to null, meaning MovingObject is blocked and has hit something it can interact with.
             if(!gameManager.instance.canMove && hitComponent != null)
-                
+            {
                 //Call the OnCantMove function and pass it hitComponent as a parameter.
                 OnCantMove(hitComponent);
+            }
+            return canMove;
         }
         
         
