@@ -8,14 +8,15 @@ using Weapons;
 //Player inherits from MovingObject, our base class for objects that can move, Enemy also inherits from this.
 public class playerMovement : movingObject
 {
-    public float restartLevelDelay = 1f;        //Delay time in seconds to restart level.
-    public int pointsPerFood = 10;              //Number of points to add to player food points when picking up a food object.
-    public int pointsPerSoda = 20;              //Number of points to add to player food points when picking up a soda object.
-    public int wallDamage = 1;                  //How much damage a player does to a wall when chopping it.
-    private Animator animator;                  //Used to store a reference to the Player's animator component.
-    public Direction direction = Direction.NORTH;
-    public Weapon currentWeapon = new BaseSword();
-    
+    public  float       restartLevelDelay   = 1f;                   //Delay time in seconds to restart level.
+    private Animator    animator;                                  //store a reference to the Player's animator component.
+    public  Direction   direction           = Direction.NORTH;    //enum for direction facing
+    public  Weapon      currentWeapon       = new BaseSword();   //
+
+    //Weapons Testing
+    private List<Weapon> weaponsTest = new List<Weapon>{ new BaseSword(), new BroadSword(), new TSword()};
+    private int weaponNum = 0;
+
     //Start overrides the Start function of MovingObject
     protected override void Start ()
     {
@@ -55,22 +56,12 @@ public class playerMovement : movingObject
             Turn(Direction.EAST);
         }
 
-        if (Input.GetKeyDown("j"))
-        {
-            print(direction);
-        }
         if (Input.GetKeyDown("k"))
         {
-            if(currentWeapon.GetType() == typeof(BaseSword))
-            {
-                currentWeapon = new TSword();
-            }
-            else
-            {
-                currentWeapon = new BaseSword();
-            }
-
+            if (weaponNum >= weaponsTest.Count) weaponNum = 0;
+            currentWeapon = weaponsTest.ElementAt(weaponNum);
             print("Equipped " + currentWeapon.GetType().ToString());
+            weaponNum++;
         }
 
         //prevent diagonal movements
@@ -119,7 +110,7 @@ public class playerMovement : movingObject
     //It takes a generic parameter T which in the case of Player is a Wall which the player can attack and destroy.
     protected override void OnCantMove <T> (T component)
     {
-        print("CANT MOVE");
+        //print("CANT MOVE");
     }
 
     protected void Turn(Direction dir) 
@@ -129,7 +120,7 @@ public class playerMovement : movingObject
 
     protected bool AttemptAttack(Direction attackDir)
     {
-        var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, attackDir, base.pixelsPerTile);
+        var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, attackDir);
         if (attackRange.Any(h => h.collider != null)) {
             //checkHit(hit);
             print("HIT");
