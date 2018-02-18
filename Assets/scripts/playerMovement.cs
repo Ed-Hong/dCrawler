@@ -82,11 +82,12 @@ public class playerMovement : movingObject
         //see if input in h or v is not zero
         if(horizontal != 0 || vertical != 0)
         {
-            if(AttemptMove<BoxCollider> (horizontal, vertical))
+
+            if (!AttemptAttack(direction) && AttemptMove<BoxCollider>(horizontal, vertical))
             {
                 gameManager.instance.canMove = false; //disables input until player is done changin tiles
             }
-            AttemptAttack(direction);
+
         }
     }
     
@@ -126,13 +127,15 @@ public class playerMovement : movingObject
         direction = dir;
     }
 
-    protected void AttemptAttack(Direction attackDir)
+    protected bool AttemptAttack(Direction attackDir)
     {
         var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, attackDir, base.pixelsPerTile);
         if (attackRange.Any(h => h.collider != null)) {
             //checkHit(hit);
             print("HIT");
+            return true;
         }
+        return false;
     }
     
     
