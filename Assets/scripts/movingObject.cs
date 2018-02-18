@@ -35,7 +35,7 @@ using System.Collections;
             Vector2 start = transform.position;
 
             // Calculate end position based on the direction parameters passed in when calling Move.
-            Vector2 end = start + new Vector2 (xDir * gameManager.instance.xTileSize, yDir * gameManager.instance.yTileSize);
+            Vector2 end = start + new Vector2 (xDir * gameManager.xTileSize, yDir * gameManager.yTileSize);
             
             //Disable the boxCollider so that linecast doesn't hit this object's own collider.
             boxCollider.enabled = false;

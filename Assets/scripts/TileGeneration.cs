@@ -14,12 +14,13 @@ public class TileGeneration : MonoBehaviour {
 
 	void Start() 
 	{
-		xTileSize = gameManager.instance.xTileSize;
-		yTileSize = gameManager.instance.yTileSize;
-		GameObject.FindWithTag("Player").transform.position = new Vector2(
+  	xTileSize = gameManager.xTileSize;
+		yTileSize = gameManager.yTileSize;
+    GameObject.FindWithTag("Player").transform.position = new Vector2(
 			Mathf.Round((xTileSize*3) + xMargin), 
 			Mathf.Round((yTileSize*3) + yMargin)
 		);
+    
 		GenerateLevel();
 	}
 
