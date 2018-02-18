@@ -46,6 +46,7 @@ public class playerMovement : movingObject
             Turn(Direction.SOUTH);
         }else if(Input.GetKeyDown("a")){
             horizontal -= 1;
+
             Turn(Direction.WEST);
         }else if(Input.GetKeyDown("d")){
             horizontal += 1;

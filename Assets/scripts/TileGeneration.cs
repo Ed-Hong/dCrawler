@@ -6,8 +6,8 @@ public class TileGeneration : MonoBehaviour {
 
 	public Texture2D textureToGenerateFrom;
 	public GameObject tilePrefab;
-	private int xMargin = -77;
-	private int yMargin = -144;
+	private float xMargin = -76.5f;
+	private float yMargin = -145.5f;
 
 	private int xTileSize;
 	private int yTileSize;
@@ -16,7 +16,10 @@ public class TileGeneration : MonoBehaviour {
 	{
 		xTileSize = gameManager.instance.xTileSize;
 		yTileSize = gameManager.instance.yTileSize;
-		GameObject.FindWithTag("Player").transform.position = new Vector2((xTileSize*3) + xMargin, (yTileSize*3) + yMargin);
+		GameObject.FindWithTag("Player").transform.position = new Vector2(
+			Mathf.Round((xTileSize*3) + xMargin), 
+			Mathf.Round((yTileSize*3) + yMargin)
+		);
 		GenerateLevel();
 	}
 
