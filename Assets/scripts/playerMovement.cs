@@ -14,7 +14,7 @@ public class playerMovement : movingObject
     public int wallDamage = 1;                  //How much damage a player does to a wall when chopping it.
     private Animator animator;                  //Used to store a reference to the Player's animator component.
     public Direction direction = Direction.NORTH;
-    public Weapon currentWeapon = new TSword();
+    public Weapon currentWeapon = new BaseSword();
     
     //Start overrides the Start function of MovingObject
     protected override void Start ()
@@ -58,6 +58,19 @@ public class playerMovement : movingObject
         if (Input.GetKeyDown("j"))
         {
             print(direction);
+        }
+        if (Input.GetKeyDown("k"))
+        {
+            if(currentWeapon.GetType() == typeof(BaseSword))
+            {
+                currentWeapon = new TSword();
+            }
+            else
+            {
+                currentWeapon = new BaseSword();
+            }
+
+            print("Equipped " + currentWeapon.GetType().ToString());
         }
 
         //prevent diagonal movements
