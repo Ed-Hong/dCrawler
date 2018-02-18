@@ -12,7 +12,11 @@ public class playerMovement : movingObject
     private Animator    animator;                                  //store a reference to the Player's animator component.
     public  Direction   direction           = Direction.NORTH;    //enum for direction facing
     public  Weapon      currentWeapon       = new BaseSword();   //
-    
+
+    //Weapons Testing
+    private List<Weapon> weaponsTest = new List<Weapon>{ new BaseSword(), new BroadSword(), new TSword()};
+    private int weaponNum = 0;
+
     //Start overrides the Start function of MovingObject
     protected override void Start ()
     {
@@ -54,16 +58,10 @@ public class playerMovement : movingObject
 
         if (Input.GetKeyDown("k"))
         {
-            if(currentWeapon.GetType() == typeof(BaseSword))
-            {
-                currentWeapon = new TSword();
-            }
-            else
-            {
-                currentWeapon = new BaseSword();
-            }
-
+            if (weaponNum >= weaponsTest.Count) weaponNum = 0;
+            currentWeapon = weaponsTest.ElementAt(weaponNum);
             print("Equipped " + currentWeapon.GetType().ToString());
+            weaponNum++;
         }
 
         //prevent diagonal movements
@@ -122,7 +120,7 @@ public class playerMovement : movingObject
 
     protected bool AttemptAttack(Direction attackDir)
     {
-        var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, attackDir, base.pixelsPerTile);
+        var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, attackDir);
         if (attackRange.Any(h => h.collider != null)) {
             //checkHit(hit);
             print("HIT");

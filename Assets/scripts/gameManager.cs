@@ -6,8 +6,8 @@ public class gameManager : MonoBehaviour
 {
     public static gameManager instance = null;		//makes singleton of gameManager, allowing to be accessed anywhere in any script
     public bool canMove = true;
-    public int xTileSize = 27;
-    public int yTileSize = 21;                  //Current level number, expressed in game as "Day 1".
+    public const int xTileSize = 27;
+    public const int yTileSize = 21;                  //Current level number, expressed in game as "Day 1".
 
     //Awake is always called before any Start functions
     void Awake()

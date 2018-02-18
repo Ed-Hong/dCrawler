@@ -4,7 +4,7 @@ using System.Collections;
     //The abstract keyword enables you to create classes and class members that are incomplete and must be implemented in a derived class.
     public abstract class movingObject : MonoBehaviour
     {
-        protected int           speed               = 10;              //nebulous int that effects the speed of the move transition
+        protected int           speed               = 35;              //nebulous int that effects the speed of the move transition
         private float           moveTime            = 0.1f;             //???
         private float           inverseMoveTime;                        //Used to make movement more efficient.
 
@@ -35,7 +35,7 @@ using System.Collections;
             Vector2 start = transform.position;
 
             // Calculate end position based on the direction parameters passed in when calling Move.
-            Vector2 end = start + new Vector2 (xDir * gameManager.instance.xTileSize, yDir * gameManager.instance.yTileSize);
+            Vector2 end = start + new Vector2 (xDir * gameManager.xTileSize, yDir * gameManager.yTileSize);
             
             //Disable the boxCollider so that linecast doesn't hit this object's own collider.
             boxCollider.enabled = false;
