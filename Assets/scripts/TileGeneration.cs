@@ -14,9 +14,13 @@ public class TileGeneration : MonoBehaviour {
 
 	void Start() 
 	{
-		xTileSize = gameManager.xTileSize;
+  	xTileSize = gameManager.xTileSize;
 		yTileSize = gameManager.yTileSize;
-		GameObject.FindWithTag("Player").transform.position = new Vector2((xTileSize*3) + xMargin, (yTileSize*3) + yMargin);
+    GameObject.FindWithTag("Player").transform.position = new Vector2(
+			Mathf.Round((xTileSize*3) + xMargin), 
+			Mathf.Round((yTileSize*3) + yMargin)
+		);
+    
 		GenerateLevel();
 	}
 
