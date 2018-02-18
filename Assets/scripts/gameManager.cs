@@ -1,0 +1,34 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;       //Allows us to use Lists. 
+    
+public class gameManager : MonoBehaviour
+{
+
+    public static gameManager instance = null;		//makes singleton of gameManager, allowing to be accessed anywhere in any script
+    public bool canMove = true;
+    private int level = 3;                           //Current level number, expressed in game as "Day 1".
+
+    //Awake is always called before any Start functions
+    void Awake()
+    {
+        //Check if instance already exists
+        if (instance == null){
+			instance = this;
+		} else if (instance != this){
+			Destroy(gameObject);
+		}
+                
+        DontDestroyOnLoad(gameObject);
+        InitGame();
+
+    }
+        
+    //Initializes the game for each level.
+    void InitGame()
+    {
+		//Initalize stuff idk
+    }
+}
+        
+        
