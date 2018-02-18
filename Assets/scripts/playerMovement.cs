@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;      //Allows us to use SceneManager
 using Util;
+using Weapons;
 
 //Player inherits from MovingObject, our base class for objects that can move, Enemy also inherits from this.
 public class playerMovement : movingObject
@@ -13,6 +14,7 @@ public class playerMovement : movingObject
     public int wallDamage = 1;                  //How much damage a player does to a wall when chopping it.
     private Animator animator;                  //Used to store a reference to the Player's animator component.
     public Direction direction = Direction.NORTH;
+    public Weapon currentWeapon = new TSword();
     
     //Start overrides the Start function of MovingObject
     protected override void Start ()
@@ -113,109 +115,7 @@ public class playerMovement : movingObject
 
     protected void AttemptAttack(Direction attackDir)
     {
-        var playerPos = transform.position;
-        Vector2 attackPos1;
-        Vector2 attackPos2;
-        Vector2 attackPos3;
-        Vector2 attackPos4;
-
-        RaycastHit2D hit1;
-        RaycastHit2D hit2;
-        RaycastHit2D hit3;
-        RaycastHit2D hit4;
-
-        var attackRange = new List<RaycastHit2D>();
-
-        switch (attackDir)
-        {
-            case (Direction.NORTH):
-            // bottom of T
-            attackPos1 = new Vector2(playerPos.x, playerPos.y + base.pixelsPerTile);
-            hit1 = Physics2D.Raycast(attackPos1, Vector2.zero);
-            attackRange.Add(hit1);
-
-            // center of T
-            attackPos2 = new Vector2(playerPos.x, playerPos.y + 2 * base.pixelsPerTile);
-            hit2 = Physics2D.Raycast(attackPos2, Vector2.zero);
-            attackRange.Add(hit2);
-
-            // topleft of T
-            attackPos3 = new Vector2(playerPos.x - base.pixelsPerTile, playerPos.y + 2 * base.pixelsPerTile);
-            hit3 = Physics2D.Raycast(attackPos3, Vector2.zero);
-            attackRange.Add(hit3);
-
-            // topright of T
-            attackPos4 = new Vector2(playerPos.x + base.pixelsPerTile, playerPos.y + 2 * base.pixelsPerTile);
-            hit4 = Physics2D.Raycast(attackPos4, Vector2.zero);
-            attackRange.Add(hit4);
-            break;
-
-            case (Direction.EAST):
-            // bottom of T
-            attackPos1 = new Vector2(playerPos.x + base.pixelsPerTile, playerPos.y);
-            hit1 = Physics2D.Raycast(attackPos1, Vector2.zero);
-            attackRange.Add(hit1);
-                
-            // center of T
-            attackPos2 = new Vector2(playerPos.x + 2*base.pixelsPerTile, playerPos.y);
-            hit2 = Physics2D.Raycast(attackPos2, Vector2.zero);
-            attackRange.Add(hit2);
-
-            // topleft of T
-            attackPos3 = new Vector2(playerPos.x + 2*base.pixelsPerTile, playerPos.y + base.pixelsPerTile);
-            hit3 = Physics2D.Raycast(attackPos3, Vector2.zero);
-            attackRange.Add(hit3);
-
-            // topright of T
-            attackPos4 = new Vector2(playerPos.x + 2*base.pixelsPerTile, playerPos.y - base.pixelsPerTile);
-            hit4 = Physics2D.Raycast(attackPos4, Vector2.zero);
-            attackRange.Add(hit4);
-            break;
-
-            case (Direction.SOUTH):
-            // bottom of T
-            attackPos1 = new Vector2(playerPos.x, playerPos.y - base.pixelsPerTile);
-            hit1 = Physics2D.Raycast(attackPos1, Vector2.zero);
-            attackRange.Add(hit1);
-
-            // center of T
-            attackPos2 = new Vector2(playerPos.x, playerPos.y - 2*base.pixelsPerTile);
-            hit2 = Physics2D.Raycast(attackPos2, Vector2.zero);
-            attackRange.Add(hit2);
-
-            // topleft of T
-            attackPos3 = new Vector2(playerPos.x - base.pixelsPerTile + base.pixelsPerTile, playerPos.y - 2*base.pixelsPerTile);
-            hit3 = Physics2D.Raycast(attackPos3, Vector2.zero);
-            attackRange.Add(hit3);
-
-            // topright of T
-            attackPos4 = new Vector2(playerPos.x + base.pixelsPerTile - base.pixelsPerTile, playerPos.y - 2*base.pixelsPerTile);
-            hit4 = Physics2D.Raycast(attackPos4, Vector2.zero);
-            attackRange.Add(hit4);
-            break;
-
-            case (Direction.WEST):
-            // bottom of T
-            attackPos1 = new Vector2(playerPos.x - base.pixelsPerTile, playerPos.y);
-            hit1 = Physics2D.Raycast(attackPos1, Vector2.zero);
-            attackRange.Add(hit1);
-
-            // center of T
-            attackPos2 = new Vector2(playerPos.x - 2 * base.pixelsPerTile, playerPos.y);
-            hit2 = Physics2D.Raycast(attackPos2, Vector2.zero);
-            attackRange.Add(hit2);
-
-            // topleft of T
-            attackPos3 = new Vector2(playerPos.x - 2 * base.pixelsPerTile, playerPos.y + base.pixelsPerTile);
-            hit3 = Physics2D.Raycast(attackPos3, Vector2.zero);
-            attackRange.Add(hit3);
-
-            // topright of T
-            attackPos4 = new Vector2(playerPos.x - 2 * base.pixelsPerTile, playerPos.y - base.pixelsPerTile);
-            hit4 = Physics2D.Raycast(attackPos4, Vector2.zero);
-            attackRange.Add(hit4);
-            break;
-        }
+        var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, attackDir, base.pixelsPerTile);
         if (attackRange.Any(h => h.collider != null)) {
             //checkHit(hit);
             print("HIT");
