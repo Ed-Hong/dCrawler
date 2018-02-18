@@ -55,7 +55,7 @@ public class playerMovement : movingObject
 
         if (Input.GetKeyDown("j"))
         {
-            print(gameManager.instance.canMove);
+            print(direction);
         }
 
         //prevent diagonal movements
@@ -71,7 +71,7 @@ public class playerMovement : movingObject
             {
                 gameManager.instance.canMove = false; //disables input until player is done changin tiles
             }
-            AttemptAttack();
+            AttemptAttack(direction);
         }
     }
     
@@ -111,34 +111,111 @@ public class playerMovement : movingObject
         direction = dir;
     }
 
-    protected void AttemptAttack()
+    protected void AttemptAttack(Direction attackDir)
     {
         var playerPos = transform.position;
+        Vector2 attackPos1;
+        Vector2 attackPos2;
+        Vector2 attackPos3;
+        Vector2 attackPos4;
 
-        // bottom of T
-        Vector2 attackPos = new Vector2(playerPos.x, playerPos.y + base.pixelsPerTile);
-        RaycastHit2D hit = Physics2D.Raycast(attackPos, Vector2.zero);
+        RaycastHit2D hit1;
+        RaycastHit2D hit2;
+        RaycastHit2D hit3;
+        RaycastHit2D hit4;
 
-        // center of T
-        Vector2 attackPos2 = new Vector2(playerPos.x, playerPos.y + 2*base.pixelsPerTile);
-        RaycastHit2D hit2 = Physics2D.Raycast(attackPos2, Vector2.zero);
+        var attackRange = new List<RaycastHit2D>();
 
-        // topleft of T
-        Vector2 attackPos3 = new Vector2(playerPos.x - base.pixelsPerTile, playerPos.y + 2*base.pixelsPerTile);
-        RaycastHit2D hit3 = Physics2D.Raycast(attackPos3, Vector2.zero);
-
-        // topright of T
-        Vector2 attackPos4 = new Vector2(playerPos.x + base.pixelsPerTile, playerPos.y + 2*base.pixelsPerTile);
-        RaycastHit2D hit4 = Physics2D.Raycast(attackPos4, Vector2.zero);
-
-        var attackRange = new List<RaycastHit2D>()
+        switch (attackDir)
         {
-            hit,
-            hit2,
-            hit3,
-            hit4
-        };
+            case (Direction.NORTH):
+            // bottom of T
+            attackPos1 = new Vector2(playerPos.x, playerPos.y + base.pixelsPerTile);
+            hit1 = Physics2D.Raycast(attackPos1, Vector2.zero);
+            attackRange.Add(hit1);
 
+            // center of T
+            attackPos2 = new Vector2(playerPos.x, playerPos.y + 2 * base.pixelsPerTile);
+            hit2 = Physics2D.Raycast(attackPos2, Vector2.zero);
+            attackRange.Add(hit2);
+
+            // topleft of T
+            attackPos3 = new Vector2(playerPos.x - base.pixelsPerTile, playerPos.y + 2 * base.pixelsPerTile);
+            hit3 = Physics2D.Raycast(attackPos3, Vector2.zero);
+            attackRange.Add(hit3);
+
+            // topright of T
+            attackPos4 = new Vector2(playerPos.x + base.pixelsPerTile, playerPos.y + 2 * base.pixelsPerTile);
+            hit4 = Physics2D.Raycast(attackPos4, Vector2.zero);
+            attackRange.Add(hit4);
+            break;
+
+            case (Direction.EAST):
+            // bottom of T
+            attackPos1 = new Vector2(playerPos.x + base.pixelsPerTile, playerPos.y);
+            hit1 = Physics2D.Raycast(attackPos1, Vector2.zero);
+            attackRange.Add(hit1);
+                
+            // center of T
+            attackPos2 = new Vector2(playerPos.x + 2*base.pixelsPerTile, playerPos.y);
+            hit2 = Physics2D.Raycast(attackPos2, Vector2.zero);
+            attackRange.Add(hit2);
+
+            // topleft of T
+            attackPos3 = new Vector2(playerPos.x + 2*base.pixelsPerTile, playerPos.y + base.pixelsPerTile);
+            hit3 = Physics2D.Raycast(attackPos3, Vector2.zero);
+            attackRange.Add(hit3);
+
+            // topright of T
+            attackPos4 = new Vector2(playerPos.x + 2*base.pixelsPerTile, playerPos.y - base.pixelsPerTile);
+            hit4 = Physics2D.Raycast(attackPos4, Vector2.zero);
+            attackRange.Add(hit4);
+            break;
+
+            case (Direction.SOUTH):
+            // bottom of T
+            attackPos1 = new Vector2(playerPos.x, playerPos.y - base.pixelsPerTile);
+            hit1 = Physics2D.Raycast(attackPos1, Vector2.zero);
+            attackRange.Add(hit1);
+
+            // center of T
+            attackPos2 = new Vector2(playerPos.x, playerPos.y - 2*base.pixelsPerTile);
+            hit2 = Physics2D.Raycast(attackPos2, Vector2.zero);
+            attackRange.Add(hit2);
+
+            // topleft of T
+            attackPos3 = new Vector2(playerPos.x - base.pixelsPerTile + base.pixelsPerTile, playerPos.y - 2*base.pixelsPerTile);
+            hit3 = Physics2D.Raycast(attackPos3, Vector2.zero);
+            attackRange.Add(hit3);
+
+            // topright of T
+            attackPos4 = new Vector2(playerPos.x + base.pixelsPerTile - base.pixelsPerTile, playerPos.y - 2*base.pixelsPerTile);
+            hit4 = Physics2D.Raycast(attackPos4, Vector2.zero);
+            attackRange.Add(hit4);
+            break;
+
+            case (Direction.WEST):
+            // bottom of T
+            attackPos1 = new Vector2(playerPos.x - base.pixelsPerTile, playerPos.y);
+            hit1 = Physics2D.Raycast(attackPos1, Vector2.zero);
+            attackRange.Add(hit1);
+
+            // center of T
+            attackPos2 = new Vector2(playerPos.x - 2 * base.pixelsPerTile, playerPos.y);
+            hit2 = Physics2D.Raycast(attackPos2, Vector2.zero);
+            attackRange.Add(hit2);
+
+            // topleft of T
+            attackPos3 = new Vector2(playerPos.x - 2 * base.pixelsPerTile, playerPos.y + base.pixelsPerTile);
+            hit3 = Physics2D.Raycast(attackPos3, Vector2.zero);
+            attackRange.Add(hit3);
+
+            // topright of T
+            attackPos4 = new Vector2(playerPos.x - 2 * base.pixelsPerTile, playerPos.y - base.pixelsPerTile);
+            hit4 = Physics2D.Raycast(attackPos4, Vector2.zero);
+            attackRange.Add(hit4);
+            break;
+        }
         if (attackRange.Any(h => h.collider != null)) {
             //checkHit(hit);
             print("HIT");
