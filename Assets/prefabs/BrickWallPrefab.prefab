@@ -22,8 +22,8 @@ GameObject:
   - component: {fileID: 212243848770897002}
   - component: {fileID: 61919097029621476}
   m_Layer: 0
-  m_Name: TilePrefab
-  m_TagString: Untagged
+  m_Name: BrickWallPrefab
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

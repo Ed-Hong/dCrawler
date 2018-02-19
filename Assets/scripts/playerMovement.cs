@@ -10,6 +10,8 @@ public class playerMovement : movingObject
 {
     public  float       restartLevelDelay   = 1f;                   //Delay time in seconds to restart level.
     private Animator    animator;                                  //store a reference to the Player's animator component.
+    public Animator    weaponAnimator;                                  //store a reference to the Player's animator component.
+
     public  Direction   direction           = Direction.NORTH;    //enum for direction facing
     public  Weapon      currentWeapon       = new BaseSword();   //
 
@@ -129,6 +131,7 @@ public class playerMovement : movingObject
         {
             //checkHit(hit);
             gameManager.instance.canMove = false;
+            weaponAnimator.SetTrigger("baseSwordAttack");
             print("HIT");
             return true;
         }
