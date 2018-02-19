@@ -5,9 +5,8 @@ using System.Collections.Generic;       //Allows us to use Lists.
 public class gameManager : MonoBehaviour
 {
     public static gameManager instance = null;		//makes singleton of gameManager, allowing to be accessed anywhere in any script
-    private bool canMove = true;
     public const int xTileSize = 27;
-    public const int yTileSize = 21;                  //Current level number, expressed in game as "Day 1".
+    public const int yTileSize = 21;
 
     public delegate void StartTurnAction();
     public static event StartTurnAction OnStartTurn;
@@ -15,7 +14,11 @@ public class gameManager : MonoBehaviour
     public delegate void EndTurnAction();
     public static event EndTurnAction OnEndTurn;
 
-    private bool IsTurnInProgress = false;
+    private bool isTurnInProgress = false;
+    private bool isPlayerMoving = false;
+
+    private int minimumTurnFrames = 25;
+    private int turnFrameCounter = 0;
 
     //Awake is always called before any Start functions
     void Awake()
@@ -33,30 +36,54 @@ public class gameManager : MonoBehaviour
 
     public void StartTurn()
     {
-        if(!IsTurnInProgress && OnStartTurn != null)
+        if(!isTurnInProgress && OnStartTurn != null)
         {
-            IsTurnInProgress = true;
+            isTurnInProgress = true;
             OnStartTurn();
+            //print("START");
         }
     }
 
-    public void EndTurn()
+    public IEnumerator EndTurn()
     {
-        if (IsTurnInProgress && OnEndTurn != null)
+        yield return StartCoroutine(WaitForFrames(minimumTurnFrames - turnFrameCounter));
+        if (isTurnInProgress && OnEndTurn != null)
         {
-            IsTurnInProgress = false;
+            isTurnInProgress = false;
+            turnFrameCounter = 0;
             OnEndTurn();
+            //print("END");
         }
     }
 
-    public void SetCanMove(bool val)
+    public static IEnumerator WaitForFrames(int frameCount)
     {
-        canMove = val;
+        while (frameCount > 0)
+        {
+            frameCount--;
+            yield return null;
+        }
     }
 
-    public bool GetCanMove()
+    public bool IsTurnInProgress()
     {
-        return canMove;
+        return isTurnInProgress;
+    }
+
+    public void CountFrame()
+    {
+        turnFrameCounter++;
+        //print(turnFrameCounter);
+    }
+
+    public void SetPlayerIsMoving(bool val)
+    {
+        isPlayerMoving = val;
+    }
+
+    public bool IsPlayerMoving()
+    {
+        return isPlayerMoving;
     }
 
     //Initializes the game for each level.
