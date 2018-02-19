@@ -6,19 +6,17 @@ public class TileGeneration : MonoBehaviour {
 
 	public Texture2D textureToGenerateFrom;
 	public GameObject tilePrefab;
-	private float xMargin = -76.5f;
-	private float yMargin = -145.5f;
 
 	private int xTileSize;
 	private int yTileSize;
 
 	void Start() 
 	{
-  	xTileSize = gameManager.xTileSize;
+  	    xTileSize = gameManager.xTileSize;
 		yTileSize = gameManager.yTileSize;
-    GameObject.FindWithTag("Player").transform.position = new Vector2(
-			Mathf.Round((xTileSize*3) + xMargin), 
-			Mathf.Round((yTileSize*3) + yMargin)
+        GameObject.FindWithTag("Player").transform.position = new Vector2(
+			Mathf.Round(xTileSize*3), 
+			Mathf.Round(yTileSize*3)
 		);
     
 		GenerateLevel();
@@ -34,13 +32,15 @@ public class TileGeneration : MonoBehaviour {
 		{
 			if(pixels[i] == Color.black)
 			{
-				//finds position for tile based on pixel (multiplies by tile size
-				//if u want me to explain this, just ask
-				Vector2 pos = new Vector2((i % texWidth * xTileSize) + xMargin, (((i - (i % texWidth))/ texWidth) * yTileSize) + yMargin);
+                //finds position for tile based on pixel (multiplies by tile size
+                //if u want me to explain this, just ask
+                float x = i % texWidth;
+                float y = (i - x) / texWidth;
+                Vector2 pos = new Vector2((x * xTileSize), (y * yTileSize));
 
 				//creates tile at the new position with a zero rotation (Quaternion.identity)
 				GameObject newTile = Instantiate(tilePrefab, pos, Quaternion.identity);
-				newTile.GetComponent<SpriteRenderer>().sortingOrder = -i;
+				newTile.GetComponent<SpriteRenderer>().sortingOrder = -(int)(y);
 
 				newTile.transform.parent = transform;
 

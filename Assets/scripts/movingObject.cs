@@ -51,11 +51,14 @@ using System.Collections;
             {
                 //If nothing was hit, start SmoothMovement co-routine passing in the Vector2 end as destination
                 StartCoroutine (SmoothMovement (end));
-                
+
+                GetComponent<SpriteRenderer>().sortingOrder = -(int)(end.y / gameManager.yTileSize);
+
                 //Return true to say that Move was successful
+
                 return true;
             }
-            
+
             //If something was hit, return false, Move was unsuccesful.
             return false;
         }
