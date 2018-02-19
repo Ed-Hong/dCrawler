@@ -24,6 +24,25 @@ public class EnemyMovement : movingObject
     }
 
 
+    private void OnEnable()
+    {
+        gameManager.OnStartTurn += Go;
+        gameManager.OnEndTurn += Stop;
+    }
+
+    private void Go()
+    {
+        if (!stunned)
+        {
+            AttemptMove<BoxCollider>(0, -1);
+        }
+    }
+
+    private void Stop()
+    {
+        stunned = false;
+    }
+
     //This function is called when the behaviour becomes disabled or inactive.
     private void OnDisable()
     {
@@ -34,21 +53,7 @@ public class EnemyMovement : movingObject
 
     private void Update()
     {
-        //if the player starts to move and not being debounced
-        if (!gameManager.instance.GetCanMove() && debounce)
-        {
-            debounce = false;
-            if(!stunned)
-            {
-                AttemptMove<BoxCollider>(0, -1);
-            }
-        }
-        //if the player is done moving and being debounced
-        else if (gameManager.instance.GetCanMove() && !debounce)
-        {
-            debounce = true;
-            stunned = false;
-        }
+        //Enemies move on TurnStart() event, so no movement logic is necessary on Update()
     }
 
     public void OnHit()
