@@ -19,7 +19,6 @@ public class EnemyMovement : movingObject
     protected override void Start()
     {
         animator = GetComponent<Animator>();
-        //Start function of the movingObject base class.
         base.Start();
     }
 

@@ -4,7 +4,7 @@ using System.Collections;
     //The abstract keyword enables you to create classes and class members that are incomplete and must be implemented in a derived class.
     public abstract class movingObject : MonoBehaviour
     {
-        protected int           speed               = 35;              //nebulous int that effects the speed of the move transition
+        protected int           speed               = 55;              //nebulous int that effects the speed of the move transition
         private float           moveTime            = 0.1f;             //???
         private float           inverseMoveTime;                        //Used to make movement more efficient.
 
@@ -18,7 +18,6 @@ using System.Collections;
         {
             //Get a component reference to this object's BoxCollider2D
             boxCollider = GetComponent <BoxCollider2D> ();
-            
             //Get a component reference to this object's Rigidbody2D
             rb2D = GetComponent <Rigidbody2D> ();
             
@@ -80,6 +79,7 @@ using System.Collections;
         
         
         //Co-routine for moving units from one space to next, takes a parameter end to specify where to move to.
+
         protected IEnumerator SmoothMovement (Vector3 end)
         {
             //Calculate the remaining distance to move based on the square magnitude of the difference between current position and end parameter. 

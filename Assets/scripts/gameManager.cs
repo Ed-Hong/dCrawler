@@ -17,7 +17,7 @@ public class gameManager : MonoBehaviour
     private bool isTurnInProgress = false;
     private bool isPlayerMoving = false;
 
-    private int minimumTurnFrames = 25;
+    private int minimumTurnFrames = 5;
     private int turnFrameCounter = 0;
 
     //Awake is always called before any Start functions
@@ -62,6 +62,7 @@ public class gameManager : MonoBehaviour
         {
             frameCount--;
             yield return null;
+            print("waiting");
         }
     }
 
