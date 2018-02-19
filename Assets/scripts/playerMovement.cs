@@ -122,11 +122,6 @@ public class playerMovement : movingObject
         }
     }
 
-    protected override bool CanMove(int xDir, int yDir)
-    {
-        return base.CanMove(xDir, yDir);
-    }
-
     //AttemptMove overrides the AttemptMove function in the base class MovingObject
     //AttemptMove takes a generic parameter T which for Player will be of the type Wall, it also takes integers for x and y direction to move in.
     protected override bool AttemptMove <T> (int xDir, int yDir)
