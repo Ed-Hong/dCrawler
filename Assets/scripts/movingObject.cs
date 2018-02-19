@@ -4,7 +4,7 @@ using System.Collections;
     //The abstract keyword enables you to create classes and class members that are incomplete and must be implemented in a derived class.
     public abstract class movingObject : MonoBehaviour
     {
-        protected int           speed               = 35;              //nebulous int that effects the speed of the move transition
+        protected int           speed               = 10;              //nebulous int that effects the speed of the move transition
         private float           moveTime            = 0.1f;             //???
         private float           inverseMoveTime;                        //Used to make movement more efficient.
 
@@ -86,11 +86,11 @@ using System.Collections;
                 //Return and loop until sqrRemainingDistance is close enough to zero to end the function
                 yield return null;
             }
-            if(GetComponent<BoxCollider2D>().transform.tag == "Player")
+            if (GetComponent<BoxCollider2D>().transform.tag == "Player")
             {
-                gameManager.instance.SetCanMove(true);
+                gameManager.instance.EndTurn();
             }
-        }
+    }
         
         
         //The virtual keyword means AttemptMove can be overridden by inheriting classes using the override keyword.

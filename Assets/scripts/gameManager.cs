@@ -9,6 +9,14 @@ public class gameManager : MonoBehaviour
     public const int xTileSize = 27;
     public const int yTileSize = 21;                  //Current level number, expressed in game as "Day 1".
 
+    public delegate void StartTurnAction();
+    public static event StartTurnAction OnStartTurn;
+
+    public delegate void EndTurnAction();
+    public static event EndTurnAction OnEndTurn;
+
+    private bool IsTurnInProgress = false;
+
     //Awake is always called before any Start functions
     void Awake()
     {
@@ -21,13 +29,29 @@ public class gameManager : MonoBehaviour
                 
         DontDestroyOnLoad(gameObject);
         InitGame();
+    }
 
+    public void StartTurn()
+    {
+        if(!IsTurnInProgress && OnStartTurn != null)
+        {
+            IsTurnInProgress = true;
+            OnStartTurn();
+        }
+    }
+
+    public void EndTurn()
+    {
+        if (IsTurnInProgress && OnEndTurn != null)
+        {
+            IsTurnInProgress = false;
+            OnEndTurn();
+        }
     }
 
     public void SetCanMove(bool val)
     {
         canMove = val;
-        print("Setting canMove to " + val);
     }
 
     public bool GetCanMove()

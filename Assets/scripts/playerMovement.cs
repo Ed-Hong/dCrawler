@@ -26,8 +26,23 @@ public class playerMovement : movingObject
         //Start function of the movingObject base class.
         base.Start ();
     }
-    
-    
+
+    private void OnEnable()
+    {
+        gameManager.OnStartTurn += printTestStart;
+        gameManager.OnEndTurn += printTestEnd;
+    }
+
+    private void printTestStart()
+    {
+        print("PLAYER START");
+    }
+
+    private void printTestEnd()
+    {
+        print("PLAYER END");
+    }
+
     //This function is called when the behaviour becomes disabled or inactive.
     private void OnDisable ()
     {
@@ -57,7 +72,6 @@ public class playerMovement : movingObject
             else if (Input.GetKeyDown("a"))
             {
                 horizontal -= 1;
-
                 Turn(Direction.WEST);
             }
             else if (Input.GetKeyDown("d"))
@@ -85,7 +99,8 @@ public class playerMovement : movingObject
             {
                 if (!AttemptAttack(direction) && AttemptMove<BoxCollider>(horizontal, vertical))
                 {
-                    gameManager.instance.SetCanMove(false); //disables input until player is done changin tiles
+                    //gameManager.instance.SetCanMove(false); //disables input until player is done changin tiles
+                    gameManager.instance.StartTurn();
                 }
             }
         }

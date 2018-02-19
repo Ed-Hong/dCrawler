@@ -24,6 +24,22 @@ public class EnemyMovement : movingObject
     }
 
 
+    private void OnEnable()
+    {
+        gameManager.OnStartTurn += printTestStart;
+        gameManager.OnEndTurn += printTestEnd;
+    }
+
+    private void printTestStart()
+    {
+        print("ENEMY START");
+    }
+
+    private void printTestEnd()
+    {
+        print("ENEMY END");
+    }
+
     //This function is called when the behaviour becomes disabled or inactive.
     private void OnDisable()
     {
