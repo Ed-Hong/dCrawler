@@ -136,7 +136,6 @@ public class playerMovement : movingObject
         }))
         {
             //checkHit(hit);
-            gameManager.instance.SetCanMove(false);
             weaponAnimator.SetTrigger(currentWeapon.GetType().Name);
             print("HIT");
             return true;
