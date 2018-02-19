@@ -83,14 +83,12 @@ public class playerMovement : movingObject
         {
             horizontal -= 1;
             Turn(Direction.WEST);
-            GetComponent<SpriteRenderer>().flipX = true;
             madeMove = true;
         }
         else if (Input.GetKeyDown("d"))
         {
             horizontal += 1;
             Turn(Direction.EAST);
-            GetComponent<SpriteRenderer>().flipX = false;
             madeMove = true;
         }
 
