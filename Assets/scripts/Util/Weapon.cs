@@ -15,10 +15,11 @@ namespace Util
             foreach (Vector2 pos in AtkPositions)
             {
                 var hit = Physics2D.Raycast(TransformAtkPoint(playerPos, pos, direction), Vector2.zero);
-                if (hit.transform != null)
+                if (hit.transform != null && hit.transform.GetComponent<EnemyMovement>() != null)
                 {
                     hits.Add(hit);
-                    if(appliesStun)
+                    hit.transform.GetComponent<EnemyMovement>().OnHit();
+                    if (appliesStun)
                     {
                         hit.transform.GetComponent<EnemyMovement>().Stun();
                     }

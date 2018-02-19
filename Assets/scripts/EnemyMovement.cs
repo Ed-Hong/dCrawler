@@ -11,6 +11,7 @@ public class EnemyMovement : movingObject
     public Direction direction = Direction.NORTH;
     private bool debounce = true;
     private bool stunned = false;
+    private bool hitAnim = true;
 
     //public Weapon currentWeapon = new BaseSword();
 
@@ -47,7 +48,25 @@ public class EnemyMovement : movingObject
         {
             debounce = true;
             stunned = false;
+
         }
+    }
+
+    public void OnHit()
+    {
+        if (hitAnim)
+        {
+            StartCoroutine(FlashRed());
+        }
+    }
+
+    private IEnumerator FlashRed()
+    {
+        hitAnim = false;
+        GetComponent<SpriteRenderer>().color = Color.red;
+        yield return new WaitForSeconds(0.5f);
+        GetComponent<SpriteRenderer>().color = Color.white;
+        hitAnim = true;
     }
 
     public void Stun()
