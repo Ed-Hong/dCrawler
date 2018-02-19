@@ -8,16 +8,17 @@ using Weapons;
 //Player inherits from MovingObject, our base class for objects that can move, Enemy also inherits from this.
 public class playerMovement : movingObject
 {
-    public  float       restartLevelDelay   = 1f;                   //Delay time in seconds to restart level.
+    public  float       restartLevelDelay   = 1f;                  //Delay time in seconds to restart level.
     private Animator    animator;                                  //store a reference to the Player's animator component.
-    public Animator    weaponAnimator;                                  //store a reference to the Player's animator component.
+    public Animator    weaponAnimator;                             //store a reference to the Player's animator component.
 
     public  Direction   direction           = Direction.NORTH;    //enum for direction facing
-    public  Weapon      currentWeapon       = new BaseSword();   //
+    public  Weapon      currentWeapon       = new BaseSword();    //
 
     //Weapons Testing
     private List<Weapon> weaponsTest = new List<Weapon>{ new BaseSword(), new BroadSword(), new TSword()};
     private int weaponNum = 0;
+
 
     //Start overrides the Start function of MovingObject
     protected override void Start ()
@@ -31,8 +32,7 @@ public class playerMovement : movingObject
     //This function is called when the behaviour becomes disabled or inactive.
     private void OnDisable ()
     {
-        //When Player object is disabled, store the current local food total in the GameManager so it can be re-loaded in next level.
-        //GameManager.instance.playerFoodPoints = food;
+        //stuff
     }
     
     
@@ -57,12 +57,13 @@ public class playerMovement : movingObject
             else if (Input.GetKeyDown("a"))
             {
                 horizontal -= 1;
-
+                GetComponent<SpriteRenderer>().flipX = true;
                 Turn(Direction.WEST);
             }
             else if (Input.GetKeyDown("d"))
             {
                 horizontal += 1;
+                GetComponent<SpriteRenderer>().flipX = false;
                 Turn(Direction.EAST);
             }
 
@@ -104,11 +105,19 @@ public class playerMovement : movingObject
         RaycastHit2D hit;
 
         bool didMove = Move(xDir, yDir, out hit);
-
+            print("Move");
+            if(direction == Direction.SOUTH){
+                animator.SetTrigger("MoveDown");
+            }else if(direction == Direction.NORTH){
+                animator.SetTrigger("MoveUp");
+            }else{
+                animator.SetTrigger("MoveRight");
+            }
         //If Move returns true, meaning Player was able to move into an empty space.
         if (didMove) 
         {
-            //Call RandomizeSfx of SoundManager to play the move sound, passing in two audio clips to choose from.
+
+            
         }
 
         return didMove;
@@ -125,19 +134,19 @@ public class playerMovement : movingObject
     protected void Turn(Direction dir) 
     {
         direction = dir;
+        
     }
 
     protected bool AttemptAttack(Direction attackDir)
     {
         var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, attackDir);
         if (attackRange.Any(h => {
-            print(h.transform == null ? null : h.transform.name);
+            //print(h.transform == null ? null : h.transform.name);
             return h.transform == null ? false : h.transform.CompareTag("Enemy");
         }))
         {
-            //checkHit(hit);
             weaponAnimator.SetTrigger(currentWeapon.GetType().Name);
-            print("HIT");
+            print("Hit");
             return true;
         }
         return false;

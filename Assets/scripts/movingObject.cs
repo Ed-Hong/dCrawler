@@ -18,7 +18,6 @@ using System.Collections;
         {
             //Get a component reference to this object's BoxCollider2D
             boxCollider = GetComponent <BoxCollider2D> ();
-            
             //Get a component reference to this object's Rigidbody2D
             rb2D = GetComponent <Rigidbody2D> ();
             
@@ -50,8 +49,7 @@ using System.Collections;
             if(hit.transform == null)
             {
                 //If nothing was hit, start SmoothMovement co-routine passing in the Vector2 end as destination
-                StartCoroutine (SmoothMovement (end));
-
+                StartCoroutine (SmoothMovement(end));
                 GetComponent<SpriteRenderer>().sortingOrder = -(int)(end.y / gameManager.yTileSize);
 
                 //Return true to say that Move was successful
@@ -65,6 +63,7 @@ using System.Collections;
         
         
         //Co-routine for moving units from one space to next, takes a parameter end to specify where to move to.
+
         protected IEnumerator SmoothMovement (Vector3 end)
         {
             //Calculate the remaining distance to move based on the square magnitude of the difference between current position and end parameter. 

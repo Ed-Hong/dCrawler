@@ -19,16 +19,7 @@ public class EnemyMovement : movingObject
     protected override void Start()
     {
         animator = GetComponent<Animator>();
-        //Start function of the movingObject base class.
         base.Start();
-    }
-
-
-    //This function is called when the behaviour becomes disabled or inactive.
-    private void OnDisable()
-    {
-        //When Player object is disabled, store the current local food total in the GameManager so it can be re-loaded in next level.
-        //GameManager.instance.playerFoodPoints = food;
     }
 
 
