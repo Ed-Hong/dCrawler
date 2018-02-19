@@ -64,7 +64,7 @@ public class EnemyMovement : movingObject
     {
         hitAnim = false;
         GetComponent<SpriteRenderer>().color = Color.red;
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.1f);
         GetComponent<SpriteRenderer>().color = Color.white;
         hitAnim = true;
     }

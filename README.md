@@ -3,6 +3,7 @@
 
 
 # TODO
+1. Attack animation reflects attack direction
 1. Finish Implementing Enemy Movement
 1. Implement Enemy Attacks
 
