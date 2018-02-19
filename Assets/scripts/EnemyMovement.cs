@@ -10,6 +10,8 @@ public class EnemyMovement : movingObject
     private Animator animator;                  //Used to store a reference to the Player's animator component.
     public Direction direction = Direction.NORTH;
     private bool debounce = true;
+    private bool stunned = false;
+
     //public Weapon currentWeapon = new BaseSword();
 
     //Start overrides the Start function of MovingObject
@@ -35,13 +37,22 @@ public class EnemyMovement : movingObject
         if (!gameManager.instance.canMove && debounce)
         {
             debounce = false;
-            AttemptMove<BoxCollider>(0, -1);
+            if(!stunned)
+            {
+                AttemptMove<BoxCollider>(0, -1);
+            }
         }
         //if the player is done moving and being debounced
         else if (gameManager.instance.canMove && !debounce)
         {
             debounce = true;
+            stunned = false;
         }
+    }
+
+    public void Stun()
+    {
+        stunned = true;
     }
 
 

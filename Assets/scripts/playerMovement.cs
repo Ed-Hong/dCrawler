@@ -122,8 +122,13 @@ public class playerMovement : movingObject
     protected bool AttemptAttack(Direction attackDir)
     {
         var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, attackDir);
-        if (attackRange.Any(h => h.collider != null)) {
+        if (attackRange.Any(h => {
+            print(h.transform == null ? null : h.transform.name);
+            return h.transform == null ? false : h.transform.CompareTag("Enemy");
+        }))
+        {
             //checkHit(hit);
+            gameManager.instance.canMove = false;
             print("HIT");
             return true;
         }
