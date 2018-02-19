@@ -38,56 +38,54 @@ public class playerMovement : movingObject
     
     private void Update ()
     {
-        if(!gameManager.instance.canMove) return;
+        if (gameManager.instance.GetCanMove())
+        {
+            //variables
+            int horizontal = 0;
+            int vertical = 0;
 
-        //variables
-        int horizontal = 0;
-        int vertical = 0;
+            if (Input.GetKeyDown("w"))
+            {
+                vertical += 1;
+                Turn(Direction.NORTH);
+            }
+            else if (Input.GetKeyDown("s"))
+            {
+                vertical -= 1;
+                Turn(Direction.SOUTH);
+            }
+            else if (Input.GetKeyDown("a"))
+            {
+                horizontal -= 1;
 
-        if (Input.GetKeyDown("w"))
-        {
-            vertical += 1;
-            Turn(Direction.NORTH);
-        }
-        else if (Input.GetKeyDown("s"))
-        {
-            vertical -= 1;
-            Turn(Direction.SOUTH);
-        }
-        else if (Input.GetKeyDown("a"))
-        {
-            horizontal -= 1;
+                Turn(Direction.WEST);
+            }
+            else if (Input.GetKeyDown("d"))
+            {
+                horizontal += 1;
+                Turn(Direction.EAST);
+            }
 
-            Turn(Direction.WEST);
-        }
-        else if (Input.GetKeyDown("d"))
-        {
-            horizontal += 1;
-            Turn(Direction.EAST);
-        }
+            if (Input.GetKeyDown("k"))
+            {
+                if (weaponNum >= weaponsTest.Count) weaponNum = 0;
+                currentWeapon = weaponsTest.ElementAt(weaponNum);
+                print("Equipped " + currentWeapon.GetType().ToString());
+                weaponNum++;
+            }
 
-        if (Input.GetKeyDown("k"))
-        {
-            if (weaponNum >= weaponsTest.Count) weaponNum = 0;
-            currentWeapon = weaponsTest.ElementAt(weaponNum);
-            print("Equipped " + currentWeapon.GetType().ToString());
-            weaponNum++;
-        }
+            //prevent diagonal movements
+            if (horizontal != 0)
+            {
+                vertical = 0;
+            }
 
-        //prevent diagonal movements
-        if (horizontal != 0)
-        {
-            vertical = 0;
-        }
-
-        //see if input in h or v is not zero
-        if (horizontal != 0 || vertical != 0)
-        {
-            if (gameManager.instance.canMove)
+            //see if input in h or v is not zero
+            if (horizontal != 0 || vertical != 0)
             {
                 if (!AttemptAttack(direction) && AttemptMove<BoxCollider>(horizontal, vertical))
                 {
-                    gameManager.instance.canMove = false; //disables input until player is done changin tiles
+                    gameManager.instance.SetCanMove(false); //disables input until player is done changin tiles
                 }
             }
         }
@@ -138,7 +136,6 @@ public class playerMovement : movingObject
         }))
         {
             //checkHit(hit);
-            gameManager.instance.canMove = false;
             weaponAnimator.SetTrigger(currentWeapon.GetType().Name);
             print("HIT");
             return true;
