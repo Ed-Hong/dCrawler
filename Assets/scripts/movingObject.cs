@@ -86,7 +86,10 @@ using System.Collections;
                 //Return and loop until sqrRemainingDistance is close enough to zero to end the function
                 yield return null;
             }
-            gameManager.instance.canMove = true;
+            if(GetComponent<BoxCollider2D>().transform.tag == "Player")
+            {
+                gameManager.instance.SetCanMove(true);
+            }
         }
         
         
@@ -109,7 +112,7 @@ using System.Collections;
             T hitComponent = hit.transform.GetComponent<T> ();
             
             //If canMove is false and hitComponent is not equal to null, meaning MovingObject is blocked and has hit something it can interact with.
-            if(!gameManager.instance.canMove && hitComponent != null)
+            if(!gameManager.instance.GetCanMove() && hitComponent != null)
             {
                 //Call the OnCantMove function and pass it hitComponent as a parameter.
                 OnCantMove(hitComponent);

@@ -5,7 +5,7 @@ using System.Collections.Generic;       //Allows us to use Lists.
 public class gameManager : MonoBehaviour
 {
     public static gameManager instance = null;		//makes singleton of gameManager, allowing to be accessed anywhere in any script
-    public bool canMove = true;
+    private bool canMove = true;
     public const int xTileSize = 27;
     public const int yTileSize = 21;                  //Current level number, expressed in game as "Day 1".
 
@@ -23,7 +23,18 @@ public class gameManager : MonoBehaviour
         InitGame();
 
     }
-        
+
+    public void SetCanMove(bool val)
+    {
+        canMove = val;
+        print("Setting canMove to " + val);
+    }
+
+    public bool GetCanMove()
+    {
+        return canMove;
+    }
+
     //Initializes the game for each level.
     void InitGame()
     {

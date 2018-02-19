@@ -35,7 +35,7 @@ public class EnemyMovement : movingObject
     private void Update()
     {
         //if the player starts to move and not being debounced
-        if (!gameManager.instance.canMove && debounce)
+        if (!gameManager.instance.GetCanMove() && debounce)
         {
             debounce = false;
             if(!stunned)
@@ -44,11 +44,10 @@ public class EnemyMovement : movingObject
             }
         }
         //if the player is done moving and being debounced
-        else if (gameManager.instance.canMove && !debounce)
+        else if (gameManager.instance.GetCanMove() && !debounce)
         {
             debounce = true;
             stunned = false;
-
         }
     }
 
