@@ -8,14 +8,17 @@ using Weapons;
 //Player inherits from MovingObject, our base class for objects that can move, Enemy also inherits from this.
 public class playerMovement : movingObject
 {
-    public  float       restartLevelDelay   = 1f;                   //Delay time in seconds to restart level.
+    public  float       restartLevelDelay   = 1f;                  //Delay time in seconds to restart level.
     private Animator    animator;                                  //store a reference to the Player's animator component.
+    public  Animator    weaponAnimator;                           //store a reference to the weapon animator component.
+
     public  Direction   direction           = Direction.NORTH;    //enum for direction facing
-    public  Weapon      currentWeapon       = new BaseSword();   //
+    public  Weapon      currentWeapon       = new BaseSword();    //
 
     //Weapons Testing
     private List<Weapon> weaponsTest = new List<Weapon>{ new BaseSword(), new BroadSword(), new TSword()};
     private int weaponNum = 0;
+
 
     //Start overrides the Start function of MovingObject
     protected override void Start ()
@@ -24,37 +27,71 @@ public class playerMovement : movingObject
         //Start function of the movingObject base class.
         base.Start ();
     }
-    
-    
+
+    private void OnEnable()
+    {
+        gameManager.OnStartTurn += OnStart;
+        gameManager.OnEndTurn += OnEnd;
+    }
+
+    private void OnStart()
+    {
+        // Event for when a Turn starts
+        //print("PLAYER START");
+
+    }
+
+    private void OnEnd()
+    {
+        // Event for when a Turn ends
+        //print("PLAYER END");
+    }
+
     //This function is called when the behaviour becomes disabled or inactive.
     private void OnDisable ()
     {
-        //When Player object is disabled, store the current local food total in the GameManager so it can be re-loaded in next level.
-        //GameManager.instance.playerFoodPoints = food;
+        gameManager.OnStartTurn -= OnStart;
+        gameManager.OnEndTurn -= OnEnd;
     }
-    
     
     private void Update ()
     {
-        if(!gameManager.instance.canMove) return;
+        if (gameManager.instance.IsTurnInProgress())
+        {
+            gameManager.instance.CountFrame();
+            return;
+        }
 
         //variables
-        int horizontal = 0;     
+        int horizontal = 0;
         int vertical = 0;
-        
-        if(Input.GetKeyDown("w")){
+        bool madeMove = false;
+
+        if (Input.GetKeyDown("w"))
+        {
             vertical += 1;
             Turn(Direction.NORTH);
-        }else if(Input.GetKeyDown("s")){
+            madeMove = true;
+        }
+        else if (Input.GetKeyDown("s"))
+        {
             vertical -= 1;
             Turn(Direction.SOUTH);
-        }else if(Input.GetKeyDown("a")){
+            madeMove = true;
+        }
+        else if (Input.GetKeyDown("a"))
+        {
             horizontal -= 1;
-
             Turn(Direction.WEST);
-        }else if(Input.GetKeyDown("d")){
+            GetComponent<SpriteRenderer>().flipX = true;
+            madeMove = true;
+        }
+        else if (Input.GetKeyDown("d"))
+        {
             horizontal += 1;
             Turn(Direction.EAST);
+            GetComponent<SpriteRenderer>().flipX = false;
+            madeMove = true;
         }
 
         if (Input.GetKeyDown("k"))
@@ -65,24 +102,31 @@ public class playerMovement : movingObject
             weaponNum++;
         }
 
-        //prevent diagonal movements
-        if (horizontal != 0)
+        if(madeMove)
         {
-            vertical = 0;
-        }
-        
-        //see if input in h or v is not zero
-        if(horizontal != 0 || vertical != 0)
-        {
-
-            if (!AttemptAttack(direction) && AttemptMove<BoxCollider>(horizontal, vertical))
+            //prevent diagonal movements
+            if (horizontal != 0)
             {
-                gameManager.instance.canMove = false; //disables input until player is done changin tiles
+                vertical = 0;
             }
 
+            if(CanAttack(direction) || CanMove(horizontal, vertical))
+            {
+                gameManager.instance.StartTurn();
+                if(!AttemptAttack(direction))
+                {
+                    gameManager.instance.SetPlayerIsMoving(true);
+                    AttemptMove<BoxCollider>(horizontal, vertical);
+                }
+            }
         }
     }
-    
+
+    protected override bool CanMove(int xDir, int yDir)
+    {
+        return base.CanMove(xDir, yDir);
+    }
+
     //AttemptMove overrides the AttemptMove function in the base class MovingObject
     //AttemptMove takes a generic parameter T which for Player will be of the type Wall, it also takes integers for x and y direction to move in.
     protected override bool AttemptMove <T> (int xDir, int yDir)
@@ -96,11 +140,19 @@ public class playerMovement : movingObject
         RaycastHit2D hit;
 
         bool didMove = Move(xDir, yDir, out hit);
-
+            print("Move");
+            if(direction == Direction.SOUTH){
+                animator.SetTrigger("MoveDown");
+            }else if(direction == Direction.NORTH){
+                animator.SetTrigger("MoveUp");
+            }else{
+                animator.SetTrigger("MoveRight");
+            }
         //If Move returns true, meaning Player was able to move into an empty space.
         if (didMove) 
         {
-            //Call RandomizeSfx of SoundManager to play the move sound, passing in two audio clips to choose from.
+
+            
         }
 
         return didMove;
@@ -117,14 +169,34 @@ public class playerMovement : movingObject
     protected void Turn(Direction dir) 
     {
         direction = dir;
+        
+    }
+
+    protected bool CanAttack(Direction attackDir)
+    {
+        var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, attackDir);
+        if (attackRange.Any(h => {
+            //print(h.transform == null ? null : h.transform.name);
+            return h.transform == null ? false : h.transform.CompareTag("Enemy");
+        }))
+        {
+            return true;
+        }
+        return false;
     }
 
     protected bool AttemptAttack(Direction attackDir)
     {
         var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, attackDir);
-        if (attackRange.Any(h => h.collider != null)) {
-            //checkHit(hit);
-            print("HIT");
+        if (attackRange.Any(h => {
+            return h.transform == null ? false : h.transform.CompareTag("Enemy");
+        }))
+        {
+            //On an attack, we make the player "move up" just so that the timing for TurnEnd() is exactly synchronized with a player actually moving
+            gameManager.instance.SetPlayerIsMoving(false);
+            AttemptMove<BoxCollider>(0, 1);
+            weaponAnimator.SetTrigger(currentWeapon.GetType().Name);
+            print("Hit");
             return true;
         }
         return false;
