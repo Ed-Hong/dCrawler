@@ -10,6 +10,8 @@ public class playerMovement : movingObject
 {
     public  float       restartLevelDelay   = 1f;                   //Delay time in seconds to restart level.
     private Animator    animator;                                  //store a reference to the Player's animator component.
+    public Animator    weaponAnimator;                                  //store a reference to the Player's animator component.
+
     public  Direction   direction           = Direction.NORTH;    //enum for direction facing
     public  Weapon      currentWeapon       = new BaseSword();   //
 
@@ -39,20 +41,27 @@ public class playerMovement : movingObject
         if(!gameManager.instance.canMove) return;
 
         //variables
-        int horizontal = 0;     
+        int horizontal = 0;
         int vertical = 0;
-        
-        if(Input.GetKeyDown("w")){
+
+        if (Input.GetKeyDown("w"))
+        {
             vertical += 1;
             Turn(Direction.NORTH);
-        }else if(Input.GetKeyDown("s")){
+        }
+        else if (Input.GetKeyDown("s"))
+        {
             vertical -= 1;
             Turn(Direction.SOUTH);
-        }else if(Input.GetKeyDown("a")){
+        }
+        else if (Input.GetKeyDown("a"))
+        {
             horizontal -= 1;
 
             Turn(Direction.WEST);
-        }else if(Input.GetKeyDown("d")){
+        }
+        else if (Input.GetKeyDown("d"))
+        {
             horizontal += 1;
             Turn(Direction.EAST);
         }
@@ -70,16 +79,17 @@ public class playerMovement : movingObject
         {
             vertical = 0;
         }
-        
+
         //see if input in h or v is not zero
-        if(horizontal != 0 || vertical != 0)
+        if (horizontal != 0 || vertical != 0)
         {
-
-            if (!AttemptAttack(direction) && AttemptMove<BoxCollider>(horizontal, vertical))
+            if (gameManager.instance.canMove)
             {
-                gameManager.instance.canMove = false; //disables input until player is done changin tiles
+                if (!AttemptAttack(direction) && AttemptMove<BoxCollider>(horizontal, vertical))
+                {
+                    gameManager.instance.canMove = false; //disables input until player is done changin tiles
+                }
             }
-
         }
     }
     
@@ -122,8 +132,14 @@ public class playerMovement : movingObject
     protected bool AttemptAttack(Direction attackDir)
     {
         var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, attackDir);
-        if (attackRange.Any(h => h.collider != null)) {
+        if (attackRange.Any(h => {
+            print(h.transform == null ? null : h.transform.name);
+            return h.transform == null ? false : h.transform.CompareTag("Enemy");
+        }))
+        {
             //checkHit(hit);
+            gameManager.instance.canMove = false;
+            weaponAnimator.SetTrigger(currentWeapon.GetType().Name);
             print("HIT");
             return true;
         }

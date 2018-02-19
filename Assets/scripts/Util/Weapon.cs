@@ -7,13 +7,23 @@ namespace Util
     {
         // base atk positions assuming player is facing NORTH
         protected IEnumerable<Vector2> AtkPositions { get; set; }
+        protected bool appliesStun = false;
 
         public virtual IEnumerable<RaycastHit2D> GetHitsForPositionAndDirection(Vector2 playerPos, Direction direction)
         {
             var hits = new List<RaycastHit2D>();
             foreach (Vector2 pos in AtkPositions)
             {
-                hits.Add(Physics2D.Raycast(TransformAtkPoint(playerPos, pos, direction), Vector2.zero));
+                var hit = Physics2D.Raycast(TransformAtkPoint(playerPos, pos, direction), Vector2.zero);
+                if (hit.transform != null && hit.transform.GetComponent<EnemyMovement>() != null)
+                {
+                    hits.Add(hit);
+                    hit.transform.GetComponent<EnemyMovement>().OnHit();
+                    if (appliesStun)
+                    {
+                        hit.transform.GetComponent<EnemyMovement>().Stun();
+                    }
+                }
             }
             return hits;
         }

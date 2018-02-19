@@ -14,6 +14,8 @@ namespace Weapons
                 new Vector2(-1,1),
                 new Vector2(1,1)
             };
+
+            appliesStun = true;
         }
     }
 }
