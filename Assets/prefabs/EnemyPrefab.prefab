@@ -101,7 +101,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blockingLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   pixelsPerTile: 27
   restartLevelDelay: 1
   wallDamage: 1

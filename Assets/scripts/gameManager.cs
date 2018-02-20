@@ -14,8 +14,12 @@ public class gameManager : MonoBehaviour
     public delegate void EndTurnAction();
     public static event EndTurnAction OnEndTurn;
 
+    public delegate void KnockBackAction();
+    public static event KnockBackAction OnKnockBack;
+
     private bool isTurnInProgress = false;
     private bool isPlayerMoving = false;
+    private bool isPlayerKnockedBack = false;
 
     private int minimumTurnFrames = 5;
     private int turnFrameCounter = 0;
@@ -75,6 +79,21 @@ public class gameManager : MonoBehaviour
     {
         turnFrameCounter++;
         //print(turnFrameCounter);
+    }
+
+    public void KnockBackPlayer()
+    {
+        if(OnKnockBack != null)
+        {
+            isPlayerKnockedBack = true;
+            OnKnockBack();
+            isPlayerKnockedBack = false;
+        }
+    }
+
+    public bool IsPlayerKnockedBack()
+    {
+        return isPlayerKnockedBack;
     }
 
     public void SetPlayerIsMoving(bool val)

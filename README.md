@@ -9,7 +9,7 @@
 1. Implement Enemy Attacks
 
 # Behavioral Bugs
-1. Player can get stuck in Enemy
+
 
 # VISUAL BUGS
 1. Sword animation isn't correctly timed with Turn duration

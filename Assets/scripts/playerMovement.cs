@@ -19,6 +19,7 @@ public class playerMovement : movingObject
     private List<Weapon> weaponsTest = new List<Weapon>{ new BaseSword(), new BroadSword(), new TSword()};
     private int weaponNum = 0;
 
+    private Vector2 lastPosRelative = new Vector2(0, 0);
 
     //Start overrides the Start function of MovingObject
     protected override void Start ()
@@ -32,6 +33,7 @@ public class playerMovement : movingObject
     {
         gameManager.OnStartTurn += OnStart;
         gameManager.OnEndTurn += OnEnd;
+        gameManager.OnKnockBack += OnKnockBack;
     }
 
     private void OnStart()
@@ -45,6 +47,13 @@ public class playerMovement : movingObject
     {
         // Event for when a Turn ends
         //print("PLAYER END");
+    }
+
+    // Player is knocked back to their last position whenever they occupy the same space as an enemy.
+    private void OnKnockBack()
+    {
+        AttemptMove<BoxCollider>(-Mathf.RoundToInt(lastPosRelative.x), -Mathf.RoundToInt(lastPosRelative.y));
+        // OnHit()
     }
 
     //This function is called when the behaviour becomes disabled or inactive.
@@ -117,6 +126,7 @@ public class playerMovement : movingObject
                 {
                     gameManager.instance.SetPlayerIsMoving(true);
                     AttemptMove<BoxCollider>(horizontal, vertical);
+                    lastPosRelative = new Vector2(horizontal, vertical);
                 }
             }
         }
