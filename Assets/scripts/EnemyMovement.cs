@@ -9,7 +9,7 @@ public class EnemyMovement : movingObject
     public int wallDamage = 1;                  //How much damage a player does to a wall when chopping it.
     private Animator animator;                  //Used to store a reference to the Player's animator component.
     public Direction direction = Direction.NORTH;
-    private bool debounce = true;
+
     private bool stunned = false;
     private bool hitAnim = true;
 
@@ -31,7 +31,7 @@ public class EnemyMovement : movingObject
 
     private void Go()
     {
-        if (!stunned)
+        if (CanMove(0,-1) && !stunned)
         {
             AttemptMove<BoxCollider>(0, -1);
         }
@@ -40,6 +40,7 @@ public class EnemyMovement : movingObject
     private void Stop()
     {
         stunned = false;
+        CheckIfPlayerOverlap();
     }
 
     //This function is called when the behaviour becomes disabled or inactive.
@@ -77,6 +78,43 @@ public class EnemyMovement : movingObject
         stunned = true;
     }
 
+    private void CheckIfPlayerOverlap()
+    {
+        var hit = Physics2D.Raycast(transform.position, Vector2.zero);
+        if(hit.transform.tag == "Player")
+        {
+            print("PLAYER OVERLAP");
+            gameManager.instance.KnockBackPlayer();
+        }
+    }
+
+    protected override bool CanMove(int xDir, int yDir)
+    {
+        Vector2 start = transform.position;
+        Vector2 end = start + new Vector2(xDir * gameManager.xTileSize, yDir * gameManager.yTileSize);
+
+        //Disable the boxCollider so that linecast doesn't hit this object's own collider.
+        GetComponent<BoxCollider2D>().enabled = false;
+
+        //Cast a line from start point to end point checking collision on blockingLayer.
+
+        RaycastHit2D hit = Physics2D.Linecast(start, end, blockingLayer);
+
+        //Re-enable boxCollider after linecast
+        GetComponent<BoxCollider2D>().enabled = true;
+
+        //Check if anything was hit
+        if (hit.transform == null)
+        {
+            return true;
+        } 
+        else if(hit.transform.tag == "Player")
+        {
+            //player is infront of enemy --- attack player
+            print("PLAYER HIT");
+        }
+        return false;
+    }
 
     protected override bool AttemptMove<T>(int xDir, int yDir)
     {
@@ -86,6 +124,10 @@ public class EnemyMovement : movingObject
         if (didMove)
         {
             //Call RandomizeSfx of SoundManager to play the move sound, passing in two audio clips to choose from.
+        }
+        else
+        {
+            // didnt move
         }
         return didMove;
     }

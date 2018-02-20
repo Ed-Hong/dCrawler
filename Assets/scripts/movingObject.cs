@@ -35,12 +35,7 @@ using System.Collections;
             boxCollider.enabled = false;
 
             //Cast a line from start point to end point checking collision on blockingLayer.
-
             RaycastHit2D hit = Physics2D.Linecast(start, end, blockingLayer);
-            if (!gameManager.instance.IsPlayerMoving())
-            {
-                hit = Physics2D.Linecast(start, end, 0);
-            }
 
             //Re-enable boxCollider after linecast
             boxCollider.enabled = true;
@@ -53,7 +48,7 @@ using System.Collections;
             return false;
         }
 
-        // if can move then it will move and return true. if can't move, returns false
+        // will move if possible and return true. if can't move, returns false
         protected bool Move (int xDir, int yDir, out RaycastHit2D hit)
         {
             Vector2 start = transform.position;
@@ -61,8 +56,9 @@ using System.Collections;
             boxCollider.enabled = false;
 
             hit = Physics2D.Linecast(start, end, blockingLayer);
-            if (!gameManager.instance.IsPlayerMoving())
+            if (!gameManager.instance.IsPlayerMoving() || gameManager.instance.IsPlayerKnockedBack())
             {
+                //don't check for collision in cases where colliders would overlap
                 hit = Physics2D.Linecast(start, end, 0);
             }
 

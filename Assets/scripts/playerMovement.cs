@@ -12,13 +12,14 @@ public class playerMovement : movingObject
     private Animator    animator;                                  //store a reference to the Player's animator component.
     public  Animator    weaponAnimator;                           //store a reference to the weapon animator component.
 
-    public  Direction   direction           = Direction.NORTH;    //enum for direction facing
+    public  Direction   currentDirection    = Direction.NORTH;    //enum for direction facing
     public  Weapon      currentWeapon       = new BaseSword();    //
 
     //Weapons Testing
     private List<Weapon> weaponsTest = new List<Weapon>{ new BaseSword(), new BroadSword(), new TSword()};
     private int weaponNum = 0;
 
+    private Vector2 lastPosRelative = new Vector2(0, 0);
 
     //Start overrides the Start function of MovingObject
     protected override void Start ()
@@ -32,6 +33,7 @@ public class playerMovement : movingObject
     {
         gameManager.OnStartTurn += OnStart;
         gameManager.OnEndTurn += OnEnd;
+        gameManager.OnKnockBack += OnKnockBack;
     }
 
     private void OnStart()
@@ -45,6 +47,13 @@ public class playerMovement : movingObject
     {
         // Event for when a Turn ends
         //print("PLAYER END");
+    }
+
+    // Player is knocked back to their last position whenever they occupy the same space as an enemy.
+    private void OnKnockBack()
+    {
+        AttemptMove<BoxCollider>(-Mathf.RoundToInt(lastPosRelative.x), -Mathf.RoundToInt(lastPosRelative.y));
+        // OnHit()
     }
 
     //This function is called when the behaviour becomes disabled or inactive.
@@ -70,30 +79,31 @@ public class playerMovement : movingObject
         if (Input.GetKeyDown("w"))
         {
             vertical += 1;
-            Turn(Direction.NORTH);
+            currentDirection = Direction.NORTH;
             madeMove = true;
         }
         else if (Input.GetKeyDown("s"))
         {
             vertical -= 1;
-            Turn(Direction.SOUTH);
+            currentDirection = Direction.SOUTH;
             madeMove = true;
         }
         else if (Input.GetKeyDown("a"))
         {
             horizontal -= 1;
-            Turn(Direction.WEST);
+            currentDirection = Direction.WEST;
             GetComponent<SpriteRenderer>().flipX = true;
             madeMove = true;
         }
         else if (Input.GetKeyDown("d"))
         {
             horizontal += 1;
-            Turn(Direction.EAST);
+            currentDirection = Direction.EAST;
             GetComponent<SpriteRenderer>().flipX = false;
             madeMove = true;
         }
 
+        //debug
         if (Input.GetKeyDown("k"))
         {
             if (weaponNum >= weaponsTest.Count) weaponNum = 0;
@@ -102,7 +112,15 @@ public class playerMovement : movingObject
             weaponNum++;
         }
 
-        if(madeMove)
+        if (Input.GetKeyDown("q"))
+        {
+            print("FORCE TURN");
+            gameManager.instance.StartTurn();
+            StartCoroutine(gameManager.instance.EndTurn());
+        }
+        //---
+
+        if (madeMove)
         {
             //prevent diagonal movements
             if (horizontal != 0)
@@ -110,21 +128,17 @@ public class playerMovement : movingObject
                 vertical = 0;
             }
 
-            if(CanAttack(direction) || CanMove(horizontal, vertical))
+            if(CanAttack() || CanMove(horizontal, vertical))
             {
                 gameManager.instance.StartTurn();
-                if(!AttemptAttack(direction))
+                if(!AttemptAttack())
                 {
                     gameManager.instance.SetPlayerIsMoving(true);
                     AttemptMove<BoxCollider>(horizontal, vertical);
+                    lastPosRelative = new Vector2(horizontal, vertical);
                 }
             }
         }
-    }
-
-    protected override bool CanMove(int xDir, int yDir)
-    {
-        return base.CanMove(xDir, yDir);
     }
 
     //AttemptMove overrides the AttemptMove function in the base class MovingObject
@@ -134,28 +148,28 @@ public class playerMovement : movingObject
         //Every time player moves, subtract from food points total.
         
         //Call the AttemptMove method of the base class, passing in the component T (in this case Wall) and x and y direction to move.
-        base.AttemptMove <T> (xDir, yDir);
-        
-        //Hit allows us to reference the result of the Linecast done in Move.
-        RaycastHit2D hit;
+        bool moved = base.AttemptMove <T> (xDir, yDir);
 
-        bool didMove = Move(xDir, yDir, out hit);
-            print("Move");
-            if(direction == Direction.SOUTH){
-                animator.SetTrigger("MoveDown");
-            }else if(direction == Direction.NORTH){
-                animator.SetTrigger("MoveUp");
-            }else{
-                animator.SetTrigger("MoveRight");
-            }
-        //If Move returns true, meaning Player was able to move into an empty space.
-        if (didMove) 
+        print("Move");
+        if(currentDirection == Direction.SOUTH)
+        {
+            animator.SetTrigger("MoveDown");
+        }
+        else if(currentDirection == Direction.NORTH)
+        {
+            animator.SetTrigger("MoveUp");
+        }else
+        {
+            animator.SetTrigger("MoveRight");
+        }
+
+        if (moved) 
         {
 
             
         }
 
-        return didMove;
+        return moved;
     }
     
     
@@ -166,15 +180,9 @@ public class playerMovement : movingObject
         //print("CANT MOVE");
     }
 
-    protected void Turn(Direction dir) 
+    protected bool CanAttack()
     {
-        direction = dir;
-        
-    }
-
-    protected bool CanAttack(Direction attackDir)
-    {
-        var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, attackDir);
+        var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, currentDirection);
         if (attackRange.Any(h => {
             //print(h.transform == null ? null : h.transform.name);
             return h.transform == null ? false : h.transform.CompareTag("Enemy");
@@ -185,9 +193,9 @@ public class playerMovement : movingObject
         return false;
     }
 
-    protected bool AttemptAttack(Direction attackDir)
+    protected bool AttemptAttack()
     {
-        var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, attackDir);
+        var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, currentDirection);
         if (attackRange.Any(h => {
             return h.transform == null ? false : h.transform.CompareTag("Enemy");
         }))
@@ -195,14 +203,42 @@ public class playerMovement : movingObject
             //On an attack, we make the player "move up" just so that the timing for TurnEnd() is exactly synchronized with a player actually moving
             gameManager.instance.SetPlayerIsMoving(false);
             AttemptMove<BoxCollider>(0, 1);
-            weaponAnimator.SetTrigger(currentWeapon.GetType().Name);
+
+            RotateAttackAnimation();
+
             print("Hit");
             return true;
         }
         return false;
     }
-    
-    
+
+    private void RotateAttackAnimation()
+    {
+        int rotations = 0;
+        weaponAnimator.transform.rotation = new Quaternion();
+        switch (currentDirection)
+        {
+            case (Direction.NORTH):
+                weaponAnimator.transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y + gameManager.yTileSize));
+                rotations = 1;
+                break;
+            case (Direction.EAST):
+                weaponAnimator.transform.position = new Vector2(Mathf.RoundToInt(transform.position.x + gameManager.xTileSize), Mathf.RoundToInt(transform.position.y));
+                rotations = 0;
+                break;
+            case (Direction.SOUTH):
+                weaponAnimator.transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y - gameManager.yTileSize));
+                rotations = 3;
+                break;
+            case (Direction.WEST):
+                weaponAnimator.transform.position = new Vector2(Mathf.RoundToInt(transform.position.x - gameManager.xTileSize), Mathf.RoundToInt(transform.position.y));
+                rotations = 2;
+                break;
+        }
+        weaponAnimator.transform.RotateAround(weaponAnimator.transform.position, new Vector3(0, 0, 1), 90f * rotations);
+        weaponAnimator.SetTrigger(currentWeapon.GetType().Name);
+    }
+
     //OnTriggerEnter2D is sent when another object enters a trigger collider attached to this object (2D physics only).
     private void OnTriggerEnter2D (Collider2D other)
     {
@@ -214,7 +250,6 @@ public class playerMovement : movingObject
             enabled = false;
         }
     }
-    
     
     //Restart reloads the scene when called.
     private void Restart ()

@@ -14,8 +14,12 @@ public class gameManager : MonoBehaviour
     public delegate void EndTurnAction();
     public static event EndTurnAction OnEndTurn;
 
+    public delegate void KnockBackAction();
+    public static event KnockBackAction OnKnockBack;
+
     private bool isTurnInProgress = false;
     private bool isPlayerMoving = false;
+    private bool isPlayerKnockedBack = false;
 
     private int minimumTurnFrames = 5;
     private int turnFrameCounter = 0;
@@ -40,19 +44,19 @@ public class gameManager : MonoBehaviour
         {
             isTurnInProgress = true;
             OnStartTurn();
-            //print("START");
+            print("------START------");
         }
     }
 
     public IEnumerator EndTurn()
     {
-        yield return StartCoroutine(WaitForFrames(minimumTurnFrames - turnFrameCounter));
         if (isTurnInProgress && OnEndTurn != null)
         {
+            yield return StartCoroutine(WaitForFrames(minimumTurnFrames - turnFrameCounter));
             isTurnInProgress = false;
             turnFrameCounter = 0;
             OnEndTurn();
-            //print("END");
+            print("------END------");
         }
     }
 
@@ -61,8 +65,8 @@ public class gameManager : MonoBehaviour
         while (frameCount > 0)
         {
             frameCount--;
-            yield return null;
             print("waiting");
+            yield return null;
         }
     }
 
@@ -75,6 +79,21 @@ public class gameManager : MonoBehaviour
     {
         turnFrameCounter++;
         //print(turnFrameCounter);
+    }
+
+    public void KnockBackPlayer()
+    {
+        if(OnKnockBack != null)
+        {
+            isPlayerKnockedBack = true;
+            OnKnockBack();
+            isPlayerKnockedBack = false;
+        }
+    }
+
+    public bool IsPlayerKnockedBack()
+    {
+        return isPlayerKnockedBack;
     }
 
     public void SetPlayerIsMoving(bool val)
