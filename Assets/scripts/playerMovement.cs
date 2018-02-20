@@ -103,6 +103,7 @@ public class playerMovement : movingObject
             madeMove = true;
         }
 
+        //debug
         if (Input.GetKeyDown("k"))
         {
             if (weaponNum >= weaponsTest.Count) weaponNum = 0;
@@ -111,7 +112,15 @@ public class playerMovement : movingObject
             weaponNum++;
         }
 
-        if(madeMove)
+        if (Input.GetKeyDown("q"))
+        {
+            print("FORCE TURN");
+            gameManager.instance.StartTurn();
+            StartCoroutine(gameManager.instance.EndTurn());
+        }
+        //---
+
+        if (madeMove)
         {
             //prevent diagonal movements
             if (horizontal != 0)
