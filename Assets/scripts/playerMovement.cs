@@ -148,28 +148,28 @@ public class playerMovement : movingObject
         //Every time player moves, subtract from food points total.
         
         //Call the AttemptMove method of the base class, passing in the component T (in this case Wall) and x and y direction to move.
-        base.AttemptMove <T> (xDir, yDir);
-        
-        //Hit allows us to reference the result of the Linecast done in Move.
-        RaycastHit2D hit;
+        bool moved = base.AttemptMove <T> (xDir, yDir);
 
-        bool didMove = Move(xDir, yDir, out hit);
-            print("Move");
-            if(currentDirection == Direction.SOUTH){
-                animator.SetTrigger("MoveDown");
-            }else if(currentDirection == Direction.NORTH){
-                animator.SetTrigger("MoveUp");
-            }else{
-                animator.SetTrigger("MoveRight");
-            }
-        //If Move returns true, meaning Player was able to move into an empty space.
-        if (didMove) 
+        print("Move");
+        if(currentDirection == Direction.SOUTH)
+        {
+            animator.SetTrigger("MoveDown");
+        }
+        else if(currentDirection == Direction.NORTH)
+        {
+            animator.SetTrigger("MoveUp");
+        }else
+        {
+            animator.SetTrigger("MoveRight");
+        }
+
+        if (moved) 
         {
 
             
         }
 
-        return didMove;
+        return moved;
     }
     
     

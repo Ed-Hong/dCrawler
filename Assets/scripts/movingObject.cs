@@ -35,12 +35,7 @@ using System.Collections;
             boxCollider.enabled = false;
 
             //Cast a line from start point to end point checking collision on blockingLayer.
-
             RaycastHit2D hit = Physics2D.Linecast(start, end, blockingLayer);
-            if (!gameManager.instance.IsPlayerMoving())
-            {
-                hit = Physics2D.Linecast(start, end, 0);
-            }
 
             //Re-enable boxCollider after linecast
             boxCollider.enabled = true;

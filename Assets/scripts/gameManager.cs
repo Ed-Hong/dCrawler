@@ -44,19 +44,19 @@ public class gameManager : MonoBehaviour
         {
             isTurnInProgress = true;
             OnStartTurn();
-            //print("START");
+            print("------START------");
         }
     }
 
     public IEnumerator EndTurn()
     {
-        yield return StartCoroutine(WaitForFrames(minimumTurnFrames - turnFrameCounter));
         if (isTurnInProgress && OnEndTurn != null)
         {
+            yield return StartCoroutine(WaitForFrames(minimumTurnFrames - turnFrameCounter));
             isTurnInProgress = false;
             turnFrameCounter = 0;
             OnEndTurn();
-            //print("END");
+            print("------END------");
         }
     }
 
@@ -65,8 +65,8 @@ public class gameManager : MonoBehaviour
         while (frameCount > 0)
         {
             frameCount--;
-            yield return null;
             print("waiting");
+            yield return null;
         }
     }
 

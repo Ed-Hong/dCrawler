@@ -80,7 +80,7 @@ public class EnemyMovement : movingObject
 
     private void CheckIfPlayerOverlap()
     {
-        var hit = Physics2D.Raycast(GetComponent<BoxCollider2D>().transform.position, Vector2.zero);
+        var hit = Physics2D.Raycast(transform.position, Vector2.zero);
         if(hit.transform.tag == "Player")
         {
             print("PLAYER OVERLAP");
