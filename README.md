@@ -3,7 +3,7 @@
 
 
 # TODO
-1. Enemy OnHit Flash should only occur once at start of Turn
+1. Enemy OnHit should only occur once at start of Turn
 1. Finish Implementing Enemy Movement
 1. Implement Enemy Attacks
 
