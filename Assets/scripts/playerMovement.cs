@@ -12,7 +12,7 @@ public class playerMovement : movingObject
     private Animator    animator;                                  //store a reference to the Player's animator component.
     public  Animator    weaponAnimator;                           //store a reference to the weapon animator component.
 
-    public  Direction   direction           = Direction.NORTH;    //enum for direction facing
+    public  Direction   currentDirection    = Direction.NORTH;    //enum for direction facing
     public  Weapon      currentWeapon       = new BaseSword();    //
 
     //Weapons Testing
@@ -79,26 +79,26 @@ public class playerMovement : movingObject
         if (Input.GetKeyDown("w"))
         {
             vertical += 1;
-            Turn(Direction.NORTH);
+            currentDirection = Direction.NORTH;
             madeMove = true;
         }
         else if (Input.GetKeyDown("s"))
         {
             vertical -= 1;
-            Turn(Direction.SOUTH);
+            currentDirection = Direction.SOUTH;
             madeMove = true;
         }
         else if (Input.GetKeyDown("a"))
         {
             horizontal -= 1;
-            Turn(Direction.WEST);
+            currentDirection = Direction.WEST;
             GetComponent<SpriteRenderer>().flipX = true;
             madeMove = true;
         }
         else if (Input.GetKeyDown("d"))
         {
             horizontal += 1;
-            Turn(Direction.EAST);
+            currentDirection = Direction.EAST;
             GetComponent<SpriteRenderer>().flipX = false;
             madeMove = true;
         }
@@ -128,10 +128,10 @@ public class playerMovement : movingObject
                 vertical = 0;
             }
 
-            if(CanAttack(direction) || CanMove(horizontal, vertical))
+            if(CanAttack() || CanMove(horizontal, vertical))
             {
                 gameManager.instance.StartTurn();
-                if(!AttemptAttack(direction))
+                if(!AttemptAttack())
                 {
                     gameManager.instance.SetPlayerIsMoving(true);
                     AttemptMove<BoxCollider>(horizontal, vertical);
@@ -155,9 +155,9 @@ public class playerMovement : movingObject
 
         bool didMove = Move(xDir, yDir, out hit);
             print("Move");
-            if(direction == Direction.SOUTH){
+            if(currentDirection == Direction.SOUTH){
                 animator.SetTrigger("MoveDown");
-            }else if(direction == Direction.NORTH){
+            }else if(currentDirection == Direction.NORTH){
                 animator.SetTrigger("MoveUp");
             }else{
                 animator.SetTrigger("MoveRight");
@@ -180,15 +180,9 @@ public class playerMovement : movingObject
         //print("CANT MOVE");
     }
 
-    protected void Turn(Direction dir) 
+    protected bool CanAttack()
     {
-        direction = dir;
-        
-    }
-
-    protected bool CanAttack(Direction attackDir)
-    {
-        var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, attackDir);
+        var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, currentDirection);
         if (attackRange.Any(h => {
             //print(h.transform == null ? null : h.transform.name);
             return h.transform == null ? false : h.transform.CompareTag("Enemy");
@@ -199,9 +193,9 @@ public class playerMovement : movingObject
         return false;
     }
 
-    protected bool AttemptAttack(Direction attackDir)
+    protected bool AttemptAttack()
     {
-        var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, attackDir);
+        var attackRange = currentWeapon.GetHitsForPositionAndDirection(transform.position, currentDirection);
         if (attackRange.Any(h => {
             return h.transform == null ? false : h.transform.CompareTag("Enemy");
         }))
@@ -209,14 +203,42 @@ public class playerMovement : movingObject
             //On an attack, we make the player "move up" just so that the timing for TurnEnd() is exactly synchronized with a player actually moving
             gameManager.instance.SetPlayerIsMoving(false);
             AttemptMove<BoxCollider>(0, 1);
-            weaponAnimator.SetTrigger(currentWeapon.GetType().Name);
+
+            RotateAttackAnimation();
+
             print("Hit");
             return true;
         }
         return false;
     }
-    
-    
+
+    private void RotateAttackAnimation()
+    {
+        int rotations = 0;
+        weaponAnimator.transform.rotation = new Quaternion();
+        switch (currentDirection)
+        {
+            case (Direction.NORTH):
+                weaponAnimator.transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y + gameManager.yTileSize));
+                rotations = 1;
+                break;
+            case (Direction.EAST):
+                weaponAnimator.transform.position = new Vector2(Mathf.RoundToInt(transform.position.x + gameManager.xTileSize), Mathf.RoundToInt(transform.position.y));
+                rotations = 0;
+                break;
+            case (Direction.SOUTH):
+                weaponAnimator.transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y - gameManager.yTileSize));
+                rotations = 3;
+                break;
+            case (Direction.WEST):
+                weaponAnimator.transform.position = new Vector2(Mathf.RoundToInt(transform.position.x - gameManager.xTileSize), Mathf.RoundToInt(transform.position.y));
+                rotations = 2;
+                break;
+        }
+        weaponAnimator.transform.RotateAround(weaponAnimator.transform.position, new Vector3(0, 0, 1), 90f * rotations);
+        weaponAnimator.SetTrigger(currentWeapon.GetType().Name);
+    }
+
     //OnTriggerEnter2D is sent when another object enters a trigger collider attached to this object (2D physics only).
     private void OnTriggerEnter2D (Collider2D other)
     {
@@ -228,7 +250,6 @@ public class playerMovement : movingObject
             enabled = false;
         }
     }
-    
     
     //Restart reloads the scene when called.
     private void Restart ()
