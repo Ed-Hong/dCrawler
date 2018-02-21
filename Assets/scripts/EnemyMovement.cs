@@ -81,7 +81,7 @@ public class EnemyMovement : movingObject
     private void CheckIfPlayerOverlap()
     {
         var hit = Physics2D.Raycast(transform.position, Vector2.zero);
-        if(hit.transform.tag == "Player")
+        if(hit.collider != null && hit.collider.tag == "Player")
         {
             print("PLAYER OVERLAP");
             gameManager.instance.KnockBackPlayer();

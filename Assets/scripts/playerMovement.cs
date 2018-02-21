@@ -52,7 +52,7 @@ public class playerMovement : movingObject
     // Player is knocked back to their last position whenever they occupy the same space as an enemy.
     private void OnKnockBack()
     {
-        AttemptMove<BoxCollider>(-Mathf.RoundToInt(lastPosRelative.x), -Mathf.RoundToInt(lastPosRelative.y));
+        PlayerMove(-Mathf.RoundToInt(lastPosRelative.x), -Mathf.RoundToInt(lastPosRelative.y));
         // OnHit()
     }
 
@@ -133,12 +133,17 @@ public class playerMovement : movingObject
                 gameManager.instance.StartTurn();
                 if(!AttemptAttack())
                 {
-                    gameManager.instance.SetPlayerIsMoving(true);
-                    AttemptMove<BoxCollider>(horizontal, vertical);
-                    lastPosRelative = new Vector2(horizontal, vertical);
+                    PlayerMove(horizontal, vertical);
                 }
             }
         }
+    }
+
+    private void PlayerMove(int horizontal, int vertical)
+    {
+        gameManager.instance.SetPlayerIsMoving(true);
+        AttemptMove<BoxCollider>(horizontal, vertical);
+        lastPosRelative = new Vector2(horizontal, vertical);
     }
 
     //AttemptMove overrides the AttemptMove function in the base class MovingObject
