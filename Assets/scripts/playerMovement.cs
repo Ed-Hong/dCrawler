@@ -46,7 +46,7 @@ public class playerMovement : movingObject
     {
         // Event for when a Turn ends
         //print("PLAYER END");
-        CheckIfEnemyOverlap();
+        CheckIfOverlap();
     }
 
     //This function is called when the behaviour becomes disabled or inactive.
@@ -242,7 +242,7 @@ public class playerMovement : movingObject
         weaponAnimator.SetTrigger(currentWeapon.GetType().Name);
     }
 
-    private void CheckIfEnemyOverlap()
+    private void CheckIfOverlap()
     {
         //Disable the boxCollider so that linecast doesn't hit this object's own collider.
         GetComponent<BoxCollider2D>().enabled = false;
