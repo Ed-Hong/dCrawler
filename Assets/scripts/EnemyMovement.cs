@@ -9,6 +9,7 @@ public class EnemyMovement : movingObject
     public int wallDamage = 1;                  //How much damage a player does to a wall when chopping it.
     private Animator animator;                  //Used to store a reference to the Player's animator component.
     public Direction direction = Direction.NORTH;
+    private Transform target;
 
     private bool stunned = false;
     private bool hitAnim = true;
@@ -19,6 +20,7 @@ public class EnemyMovement : movingObject
     protected override void Start()
     {
         animator = GetComponent<Animator>();
+        target = GameObject.FindGameObjectWithTag("Player").transform;
         base.Start();
     }
 
@@ -31,16 +33,19 @@ public class EnemyMovement : movingObject
 
     private void Go()
     {
-        if (CanMove(0,-1) && !stunned)
+        Vector2 nextMove = GetNextMove();
+        int xDir = Mathf.RoundToInt(nextMove.x);
+        int yDir = Mathf.RoundToInt(nextMove.y);
+
+        if (CanMove(xDir, yDir) && !stunned)
         {
-            AttemptMove<BoxCollider>(0, -1);
+            AttemptMove<BoxCollider>(xDir, yDir);
         }
     }
 
     private void Stop()
     {
         stunned = false;
-        CheckIfPlayerOverlap();
     }
 
     //This function is called when the behaviour becomes disabled or inactive.
@@ -78,13 +83,20 @@ public class EnemyMovement : movingObject
         stunned = true;
     }
 
-    private void CheckIfPlayerOverlap()
+    // Returns a move towards the player, with a 50/50 chance to move in the x or y direction
+    protected Vector2 GetNextMove()
     {
-        var hit = Physics2D.Raycast(transform.position, Vector2.zero);
-        if(hit.collider != null && hit.collider.tag == "Player")
+        int rng = Random.Range(0, 2);
+
+        if(rng > 0)
         {
-            print("PLAYER OVERLAP");
-            gameManager.instance.KnockBackPlayer();
+            int xDir = target.position.x > transform.position.x ? 1 : -1;
+            return new Vector2(xDir, 0);
+        }
+        else
+        {
+            int yDir = target.position.y > transform.position.y ? 1 : -1;
+            return new Vector2(0, yDir);
         }
     }
 
