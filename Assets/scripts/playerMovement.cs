@@ -71,6 +71,8 @@ public class playerMovement : movingObject
             return;
         }
 
+        CheckIfEnemyOverlap();
+
         //variables
         int horizontal = 0;
         int vertical = 0;
@@ -242,6 +244,16 @@ public class playerMovement : movingObject
         }
         weaponAnimator.transform.RotateAround(weaponAnimator.transform.position, new Vector3(0, 0, 1), 90f * rotations);
         weaponAnimator.SetTrigger(currentWeapon.GetType().Name);
+    }
+
+    private void CheckIfEnemyOverlap()
+    {
+        var hit = Physics2D.Raycast(transform.position, Vector2.zero);
+        if (hit.collider != null && hit.collider.tag == "Enemy")
+        {
+            print("ENEMY OVERLAP");
+            gameManager.instance.KnockBackPlayer();
+        }
     }
 
     //OnTriggerEnter2D is sent when another object enters a trigger collider attached to this object (2D physics only).
