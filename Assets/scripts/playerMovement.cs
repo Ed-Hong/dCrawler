@@ -64,6 +64,11 @@ public class playerMovement : movingObject
             return;
         }
 
+        if (gameManager.instance.IsPlayerKnockedBack())
+        {
+            return;
+        }
+
         //variables
         int horizontal = 0;
         int vertical = 0;
