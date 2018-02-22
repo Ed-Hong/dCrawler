@@ -40,7 +40,6 @@ public class EnemyMovement : movingObject
     private void Stop()
     {
         stunned = false;
-        CheckIfPlayerOverlap();
     }
 
     //This function is called when the behaviour becomes disabled or inactive.
@@ -76,16 +75,6 @@ public class EnemyMovement : movingObject
     public void Stun()
     {
         stunned = true;
-    }
-
-    private void CheckIfPlayerOverlap()
-    {
-        var hit = Physics2D.Raycast(transform.position, Vector2.zero);
-        if(hit.collider != null && hit.collider.tag == "Player")
-        {
-            print("PLAYER OVERLAP");
-            gameManager.instance.KnockBackPlayer();
-        }
     }
 
     protected override bool CanMove(int xDir, int yDir)

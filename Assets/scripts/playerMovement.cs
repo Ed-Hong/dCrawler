@@ -33,7 +33,6 @@ public class playerMovement : movingObject
     {
         gameManager.OnStartTurn += OnStart;
         gameManager.OnEndTurn += OnEnd;
-        gameManager.OnKnockBack += OnKnockBack;
     }
 
     private void OnStart()
@@ -47,13 +46,7 @@ public class playerMovement : movingObject
     {
         // Event for when a Turn ends
         //print("PLAYER END");
-    }
-
-    // Player is knocked back to their last position whenever they occupy the same space as an enemy.
-    private void OnKnockBack()
-    {
-        PlayerMove(-Mathf.RoundToInt(lastPosRelative.x), -Mathf.RoundToInt(lastPosRelative.y));
-        // OnHit()
+        CheckIfEnemyOverlap();
     }
 
     //This function is called when the behaviour becomes disabled or inactive.
@@ -242,6 +235,29 @@ public class playerMovement : movingObject
         }
         weaponAnimator.transform.RotateAround(weaponAnimator.transform.position, new Vector3(0, 0, 1), 90f * rotations);
         weaponAnimator.SetTrigger(currentWeapon.GetType().Name);
+    }
+
+    private void CheckIfEnemyOverlap()
+    {
+        //Disable the boxCollider so that linecast doesn't hit this object's own collider.
+        GetComponent<BoxCollider2D>().enabled = false;
+
+        var hit = Physics2D.Raycast(transform.position, Vector2.zero);
+        if (hit.collider != null)
+        {
+            print("OVERLAP");
+            KnockBackPlayer();
+        }
+
+        GetComponent<BoxCollider2D>().enabled = true;
+    }
+
+    // Player is knocked back to their last position whenever they occupy the same space as an enemy.
+    private void KnockBackPlayer()
+    {
+        gameManager.instance.SetPlayerIsKnockedBack(true);
+        PlayerMove(-Mathf.RoundToInt(lastPosRelative.x), -Mathf.RoundToInt(lastPosRelative.y));
+        // OnHit()
     }
 
     //OnTriggerEnter2D is sent when another object enters a trigger collider attached to this object (2D physics only).
