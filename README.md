@@ -9,6 +9,10 @@
 	* Each Enemy moves according to its priority
 		* For Enemies of Equal Priority, the first one encountered gets the move
 
+1. Improve Enemy Movement AI
+	* Currently, if two enemies calculate their next positions to be the same, the one with lower priority just doesn't move.
+		* Ideally, the enemy with lower priority should attempt to move somewhere else.
+
 1. Implement Enemy Attacks
 	* Enemies should always choose to attack over moving if possible (?)
 
@@ -16,7 +20,7 @@
 
 
 # Behavioral Bugs
-
+1. Player can be knocked-back into a space occupied by an enemy
 
 # Visual Bugs
 1. Sword animation isn't correctly timed with Turn duration

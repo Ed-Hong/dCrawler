@@ -11,8 +11,12 @@ public class TileGeneration : MonoBehaviour {
 
     private int xTileSize;
 	private int yTileSize;
+    
+    //debug
+    int enemyPriority = 1;
 
-	void Start() 
+
+    void Start() 
 	{
   	    xTileSize = gameManager.xTileSize;
 		yTileSize = gameManager.yTileSize;
@@ -37,6 +41,17 @@ public class TileGeneration : MonoBehaviour {
 
                 //creates tile at the new position with a zero rotation (Quaternion.identity)
                 GameObject newTile = Instantiate(tiles[tileColors.IndexOf(pixels[i])], pos, Quaternion.identity);
+
+                if(newTile.GetComponent<EnemyMovement>() != null)
+                {
+                    //debug
+                    EnemyMovement enemy = newTile.GetComponent<EnemyMovement>();
+                    enemy.Priority = enemyPriority;
+                    enemyPriority++;
+
+                    EnemyMovement.AddActiveEnemy(newTile.GetComponent<EnemyMovement>());
+                }
+
                 newTile.GetComponent<SpriteRenderer>().sortingOrder = -(int)(y);
 
                 newTile.transform.parent = transform;

@@ -42,6 +42,7 @@ public class gameManager : MonoBehaviour
             isTurnInProgress = true;
             OnStartTurn();
             print("------START------");
+            EnemyMovement.Go();
         }
     }
 
@@ -54,6 +55,7 @@ public class gameManager : MonoBehaviour
             turnFrameCounter = 0;
             OnEndTurn();
             print("------END------");
+            EnemyMovement.Stop();
         }
     }
 
