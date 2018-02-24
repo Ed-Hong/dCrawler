@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;      //Allows us to use SceneManager
 using Util;
@@ -14,9 +16,12 @@ public class EnemyMovement : movingObject
     private bool stunned = false;
     private bool hitAnim = true;
 
+    private static List<EnemyMovement> activeEnemies = null;
+    private static List<Vector2> selectedMoves = new List<Vector2>();
+    public int Priority = 0;                   // TODO make this an enum or something?
+
     //public Weapon currentWeapon = new BaseSword();
 
-    //Start overrides the Start function of MovingObject
     protected override void Start()
     {
         animator = GetComponent<Animator>();
@@ -27,25 +32,59 @@ public class EnemyMovement : movingObject
 
     private void OnEnable()
     {
-        gameManager.OnStartTurn += Go;
-        gameManager.OnEndTurn += Stop;
+        gameManager.OnStartTurn += OnEnemyTurnStart;
+        gameManager.OnEndTurn += OnEnemyTurnEnd;
     }
 
-    private void Go()
+    public static void Go()
     {
-        Vector2 nextMove = GetNextMove();
-        int xDir = Mathf.RoundToInt(nextMove.x);
-        int yDir = Mathf.RoundToInt(nextMove.y);
-
-        if (CanMove(xDir, yDir) && !stunned)
+        foreach (var enemy in activeEnemies.OrderByDescending(e => e.Priority))
         {
-            AttemptMove<BoxCollider>(xDir, yDir);
+            Vector2 nextMove = enemy.GetNextMove();
+            int xDir = Mathf.RoundToInt(nextMove.x);
+            int yDir = Mathf.RoundToInt(nextMove.y);
+
+            Vector2 start = enemy.transform.position;
+            Vector2 end = start + new Vector2(xDir * gameManager.xTileSize, yDir * gameManager.yTileSize);
+
+            bool duplicateMove = false;
+
+            if (selectedMoves.Any(p => 
+            Mathf.Abs(p.x - end.x) < float.Epsilon && 
+            Mathf.Abs(p.y - end.y) < float.Epsilon))
+            {
+                print("DUPLICATE MOVE");
+                duplicateMove = true;
+            }
+
+            if (enemy.CanMove(xDir, yDir) 
+                && !duplicateMove
+                && !enemy.stunned)
+            {
+                selectedMoves.Add(end);
+                enemy.AttemptMove<BoxCollider>(xDir, yDir);
+                print("Enemy " + enemy.Priority + " moved!");
+            }
         }
     }
 
-    private void Stop()
+    public static void Stop()
     {
-        stunned = false;
+        selectedMoves = new List<Vector2>();
+        foreach(var enemy in activeEnemies)
+        {
+            enemy.stunned = false;
+        }
+    }
+
+    private void OnEnemyTurnStart()
+    {
+
+    }
+
+    private void OnEnemyTurnEnd()
+    {
+
     }
 
     //This function is called when the behaviour becomes disabled or inactive.
@@ -59,6 +98,27 @@ public class EnemyMovement : movingObject
     private void Update()
     {
         //Enemies move on TurnStart() event, so no movement logic is necessary on Update()
+    }
+
+    public static IEnumerable<EnemyMovement> GetActiveEnemies()
+    {
+        if(activeEnemies == null)
+        {
+            activeEnemies = new List<EnemyMovement>();
+        }
+
+        return activeEnemies;
+    }
+
+    public static IEnumerable<EnemyMovement> AddActiveEnemy(EnemyMovement newEnemy)
+    {
+        if (activeEnemies == null)
+        {
+            activeEnemies = new List<EnemyMovement>();
+        }
+
+        activeEnemies.Add(newEnemy);
+        return activeEnemies;
     }
 
     public void OnHit()
@@ -83,21 +143,32 @@ public class EnemyMovement : movingObject
         stunned = true;
     }
 
-    // Returns a move towards the player, with a 50/50 chance to move in the x or y direction
+    //TODO improve enemy AI
     protected Vector2 GetNextMove()
     {
-        int rng = Random.Range(0, 2);
+        int xDir = target.position.x > transform.position.x ? 1 : -1;
+        int yDir = target.position.y > transform.position.y ? 1 : -1;
 
-        if(rng > 0)
+        // if it doesn't matter whether the enemy moves horizontally or vertically then flip a coin
+        if (Mathf.Abs(target.position.x - transform.position.x) > float.Epsilon 
+            && Mathf.Abs(target.position.y - transform.position.y) > float.Epsilon)
         {
-            int xDir = target.position.x > transform.position.x ? 1 : -1;
-            return new Vector2(xDir, 0);
+            int rng = Random.Range(0, 2);
+            if (rng > 0)
+            {
+                return new Vector2(xDir, 0);
+            }
+            else
+            {
+                return new Vector2(0, yDir);
+            }
         }
-        else
+        else if(Mathf.Abs(target.position.x - transform.position.x) < float.Epsilon)
         {
-            int yDir = target.position.y > transform.position.y ? 1 : -1;
             return new Vector2(0, yDir);
         }
+
+        return new Vector2(xDir, 0);
     }
 
     protected override bool CanMove(int xDir, int yDir)
