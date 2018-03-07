@@ -4,7 +4,7 @@ using System.Collections;
     //The abstract keyword enables you to create classes and class members that are incomplete and must be implemented in a derived class.
     public abstract class movingObject : MonoBehaviour
     {
-        protected int           speed               = 55;              //nebulous int that effects the speed of the move transition
+        protected int           speed               = 35;              //nebulous int that effects the speed of the move transition
         private float           moveTime            = 0.1f;             //???
         private float           inverseMoveTime;                        //Used to make movement more efficient.
 

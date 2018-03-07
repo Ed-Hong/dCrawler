@@ -158,21 +158,9 @@ public class playerMovement : movingObject
         bool moved = base.AttemptMove <T> (xDir, yDir);
 
         print("Move");
-        if(currentDirection == Direction.SOUTH)
-        {
-            animator.SetTrigger("MoveDown");
-        }
-        else if(currentDirection == Direction.NORTH)
-        {
-            animator.SetTrigger("MoveUp");
-        }else
-        {
-            animator.SetTrigger("MoveRight");
-        }
 
         if (moved) 
         {
-
             
         }
 
@@ -243,7 +231,7 @@ public class playerMovement : movingObject
                 break;
         }
         weaponAnimator.transform.RotateAround(weaponAnimator.transform.position, new Vector3(0, 0, 1), 90f * rotations);
-        weaponAnimator.SetTrigger(currentWeapon.GetType().Name);
+        //weaponAnimator.SetTrigger(currentWeapon.GetType().Name);
     }
 
     private void CheckIfEnemyOverlap()

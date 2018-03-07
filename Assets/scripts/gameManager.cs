@@ -5,8 +5,8 @@ using System.Collections.Generic;       //Allows us to use Lists.
 public class gameManager : MonoBehaviour
 {
     public static gameManager instance = null;		//makes singleton of gameManager, allowing to be accessed anywhere in any script
-    public const int xTileSize = 27;
-    public const int yTileSize = 21;
+    public const int xTileSize = 16;
+    public const int yTileSize = 11;
 
     public delegate void StartTurnAction();
     public static event StartTurnAction OnStartTurn;
